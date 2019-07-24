@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class UserController extends ReportAbstract {
 
-    public function login_in(Request $request){
+    public function login(Request $request){
 
         $data = [
             'username' => Q($request, 'username'),
@@ -26,10 +26,10 @@ class UserController extends ReportAbstract {
         }
     }
 
-    public function login_out(Request $request){
+    public function logout(Request $request){
         $token = $request['api_token'];
 
-        if(app()->make(UserService::class)->loginOut($token)){
+        if(app()->make(UserService::class)->logOut($token)){
             return $this->toJson(200, [], '登出成功');
         }else{
             return $this->toJson(302, [], '登出失败');

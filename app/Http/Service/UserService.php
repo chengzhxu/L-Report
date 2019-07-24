@@ -39,7 +39,7 @@ class UserService {
     }
 
 
-    public function loginOut($token){
+    public function logOut($token){
         if($token){
             $user = DB::table('admin_user')->where(['api_token' => $token])->first();
             if($user){
