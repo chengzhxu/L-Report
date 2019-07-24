@@ -27,7 +27,7 @@ class UserService {
             if($user && $pwd == Q($user, 'password')){
                 $token = strtoupper(md5(Q($user, 'username').time()));
                 if(DB::table('admin_user')->where($where)->update(['api_token' => $token])){
-                    return DB::table('admin_user')->where($where)->first();
+                    return DB::table('admin_user')->where($where)->first(['username', 'fullname', 'api_token']);
                 }
                 return false;
             }else{

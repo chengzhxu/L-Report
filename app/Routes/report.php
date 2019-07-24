@@ -21,10 +21,10 @@ use Illuminate\Routing\Router;
 
 Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.report'],], function () {
     Route::any('report/test', 'ReportController@test');
-    Route::any('user/login_out', 'UserController@login_out');
+    Route::post('user/login_out', 'UserController@login_out');
 });
 
 
 Route::group(['prefix' => '','namespace' => 'Report',], function () {
-    Route::any('user/login_in', 'UserController@login_in');
+    Route::post('user/login_in', 'UserController@login_in');
 });

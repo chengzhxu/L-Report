@@ -16,9 +16,7 @@ class ReportAbstract extends BaseController{
 
     public function __construct(Request $request)
     {
-        if(!isset($_SESSION['USERNAME'])){
-            return $this->toJson(300, [], '用户信息获取失败，请重新登录');
-        }
+//        dd(\Request::getRequestUri());
         $this->request = $request;
     }
 

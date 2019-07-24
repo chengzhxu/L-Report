@@ -79,7 +79,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapReportRoutes()
     {
-        Route::prefix('report')
+        Route::prefix('bas_stat')
             ->namespace($this->namespace . '')
             ->group(base_path('app/Routes/report.php'));
     }

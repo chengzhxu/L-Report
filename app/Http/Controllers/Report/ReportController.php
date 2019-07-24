@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Model\AppRegionNuvStatModel;
 use App\Http\Service\ReportService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends ReportAbstract {
