@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Report;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Auth;
 
 class ReportAbstract extends BaseController{
 
@@ -18,6 +19,11 @@ class ReportAbstract extends BaseController{
     {
 //        dd(\Request::getRequestUri());
         $this->request = $request;
+    }
+
+    protected function guard()
+    {
+        return Auth::guard('report');
     }
 
     /**

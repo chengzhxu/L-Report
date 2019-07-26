@@ -20,6 +20,7 @@ class UserController extends ReportAbstract {
 
         $user = app()->make(UserService::class)->checkLogin($data);
         if($user){
+            $this->guard()->setUser($user);
             return $this->toJson(200, $user, '登录成功');
         }else{
             return $this->toJson(301, [], '登录失败，用户名和密码不匹配');
@@ -30,6 +31,7 @@ class UserController extends ReportAbstract {
         $token = $request['api_token'];
 
         if(app()->make(UserService::class)->logOut($token)){
+            $this->guard()->setUser([]);
             return $this->toJson(200, [], '登出成功');
         }else{
             return $this->toJson(302, [], '登出失败');

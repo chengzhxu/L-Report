@@ -37,39 +37,7 @@ if (! function_exists('Q')) {
 if(!function_exists('array_combine_v')){
     function array_combine_v($arr1, $arr2){
         $new_arr = [];
-        $ir = 0;
         foreach ($arr1 as $k => $v){
-//            foreach ($new_arr as $nk => $nv){
-//
-//                if(array_key_exists()){
-//
-//                }
-//
-//                if($v == Q($nv, 'v')){
-//
-//                    $nc = [];
-////                    dd($arr2[Q($nv, 'k')]);
-//                    if(is_array($arr2[Q($nv, 'k')])){
-//                        $nc = $arr2[Q($nv, 'k')];
-//                        array_push($nc, $arr2[$k]);
-//                    }else{
-//                        array_push($nc, $arr2[$k]);
-//                        array_push($nc, $arr2[Q($nv, 'k')]);
-//                    }
-//                    $arr2[$k] = $nc;
-////                    $arr2[Q($nv, 'k')] = $nc;
-////                    unset($arr1[Q($nv, 'k')]);
-////                    $arr1 = array_values($arr1);
-////                    unset($arr2[Q($nv, 'k')]);
-////                    $arr2 = array_values($arr2);
-//                    $ie = $nk;
-//                    $ir = 1;
-//                    break;
-//                }else{
-//                    $xv = $arr2[$k];
-//                    $ir = 0;
-//                }
-//            }
 
             if(array_key_exists($v, $new_arr)){
                 $xv = $new_arr[$v];
@@ -102,23 +70,6 @@ if(!function_exists('array_combine_v')){
 }
 
 
-if(!function_exists('is_date')){
-    function is_date($dateString){
-        return strtotime( date('Y-m-d', strtotime($dateString)) ) === strtotime( $dateString );
-    }
-}
-
-if(!function_exists('is_json')){
-    function is_json($data = '', $assoc = false) {
-        $data = json_decode($data, $assoc);
-        if ($data && (is_object($data)) || (is_array($data) && !empty($data))) {
-            return $data;
-        }
-        return false;
-    }
-}
-
-
 if(!function_exists('file_type')){
     function file_type($file = ''){
         if($file){
@@ -143,51 +94,6 @@ if(!function_exists('file_type')){
 
         }else{
             return false;
-        }
-    }
-}
-
-
-if(!function_exists('get_file_type')){
-
-    /**
-     * 返回文件格式
-     * @param  string $str 文件名
-     * @return string      文件格式
-     */
-    function get_file_type($str)
-    {
-        // 取文件后缀名
-        $str = strtolower(pathinfo($str, PATHINFO_EXTENSION));
-        // 图片格式
-        $image = array('webp', 'jpg', 'png', 'ico', 'bmp', 'gif', 'tif', 'pcx', 'tga', 'bmp', 'pxc', 'tiff', 'jpeg', 'exif', 'fpx', 'svg', 'psd', 'cdr', 'pcd', 'dxf', 'ufo', 'eps', 'ai', 'hdri');
-        // 视频格式
-        $video = array('mp4', 'avi', '3gp', 'rmvb', 'gif', 'wmv', 'mkv', 'mpg', 'vob', 'mov', 'flv', 'swf', 'mp3', 'ape', 'wma', 'aac', 'mmf', 'amr', 'm4a', 'm4r', 'ogg', 'wav', 'wavpack');
-        // 压缩格式
-        $zip = array('rar', 'zip', 'tar', 'cab', 'uue', 'jar', 'iso', 'z', '7-zip', 'ace', 'lzh', 'arj', 'gzip', 'bz2', 'tz');
-        // 文档格式
-        $text = array('exe', 'doc', 'ppt', 'xls', 'wps', 'txt', 'lrc', 'wfs', 'torrent', 'html', 'htm', 'java', 'js', 'css', 'less', 'php', 'pdf', 'pps', 'host', 'box', 'docx', 'word', 'perfect', 'dot', 'dsf', 'efe', 'ini', 'json', 'lnk', 'log', 'msi', 'ost', 'pcs', 'tmp', 'xlsb');
-        // 匹配不同的结果
-        if($str){
-            switch ($str) {
-                case in_array($str, $image):
-                    return 'image/'.$str;
-                    break;
-                case in_array($str, $video):
-                    return 'video/'.$str;
-                    break;
-                case in_array($str, $zip):
-                    return 'zip/'.$str;
-                    break;
-                case in_array($str, $text):
-                    return 'text/'.$str;
-                    break;
-                default:
-                    return 'not find';
-                    break;
-            }
-        }else{
-            return 'not find';
         }
     }
 }
@@ -372,3 +278,23 @@ if(!function_exists('sanitize')){
     }
 }
 
+
+if(!function_exists('get_cpanel_info_test')){
+    function get_cpanel_info_test($url, $data){
+        $data  = json_encode($data);
+
+        $headerArray =array("Content-type:application/json;charset='utf-8'","Accept:application/json");
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,FALSE);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl,CURLOPT_HTTPHEADER,$headerArray);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($curl);
+        curl_close($curl);
+
+        return json_decode($output,true);
+    }
+}

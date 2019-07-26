@@ -20,11 +20,16 @@ use Illuminate\Routing\Router;
 //});
 
 Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.report'],], function () {
+    Route::any('report/get_region_pv', 'ReportController@getRegionPv');
+    Route::any('report/get_region_uv', 'ReportController@getRegionUv');
+    Route::any('report/get_region_pv_by_day', 'ReportController@getRegionPvByDay');
+
     Route::any('report/test', 'ReportController@test');
+    Route::any('report/get_cpanel_group', 'ReportController@getCpanelGroup');
     Route::post('user/logout', 'UserController@logout');
 });
 
 
-Route::group(['prefix' => '','namespace' => 'Report',], function () {
+Route::group(['prefix' => '','namespace' => 'Report'], function () {
     Route::post('user/login', 'UserController@login');
 });

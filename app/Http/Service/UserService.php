@@ -5,6 +5,7 @@ namespace App\Http\Service;
 
 
 use App\Http\Model\UserModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserService {
@@ -22,12 +23,14 @@ class UserService {
             $where = [
                 'username' => Q($data, 'username')
             ];
-            $user = DB::table('admin_user')->where($where)->first();
+            $user = $this->_model->where($where)->first();
             $pwd = md5(Q($data, 'password').Q($user, 'salt'));
             if($user && $pwd == Q($user, 'password')){
                 $token = strtoupper(md5(Q($user, 'username').time()));
-                if(DB::table('admin_user')->where($where)->update(['api_token' => $token])){
-                    return DB::table('admin_user')->where($where)->first(['username', 'fullname', 'api_token']);
+                if($this->_model->where($where)->update(['api_token' => $token])){
+                    $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token']);
+
+                    return $user;
                 }
                 return false;
             }else{
