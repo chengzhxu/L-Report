@@ -28,7 +28,7 @@ class UserService {
             if($user && $pwd == Q($user, 'password')){
                 $token = strtoupper(md5(Q($user, 'username').time()));
                 if($this->_model->where($where)->update(['api_token' => $token])){
-                    $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token']);
+                    $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid']);
 
                     return $user;
                 }

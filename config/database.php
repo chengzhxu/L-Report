@@ -41,11 +41,26 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', '172.31.0.227'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'bas_stat'),
+            'database' => env('DB_DATABASE', 'in_ssp'),
             'username' => env('DB_USERNAME', 'dev'),
             'password' => env('DB_PASSWORD', '123123'),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
+        'online_v2_cpanel' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST_CPANEL', '172.31.0.227'),
+            'port' => env('DB_PORT_CPANEL', '3306'),
+            'database' => env('DB_DATABASE_CPANEL', 'online_v2_cpanel'),
+            'username' => env('DB_USERNAME_CPANEL', 'dev'),
+            'password' => env('DB_PASSWORD_CPANEL', '123123'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',

@@ -22,7 +22,10 @@ use Illuminate\Routing\Router;
 Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.report'],], function () {
     Route::any('report/get_region_pv', 'ReportController@getRegionPv');
     Route::any('report/get_region_uv', 'ReportController@getRegionUv');
+    Route::any('report/get_realtime_data', 'ReportController@getRealTimeData');
     Route::any('report/get_region_pv_by_day', 'ReportController@getRegionPvByDay');
+    Route::any('report/get_uv_by_day', 'ReportController@getUvByDay');
+    Route::any('report/get_history_pv', 'ReportController@getHistoryPv');
 
     Route::any('report/test', 'ReportController@test');
     Route::any('report/get_cpanel_group', 'ReportController@getCpanelGroup');

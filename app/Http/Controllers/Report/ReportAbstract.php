@@ -17,13 +17,17 @@ class ReportAbstract extends BaseController{
 
     public function __construct(Request $request)
     {
-//        dd(\Request::getRequestUri());
         $this->request = $request;
     }
 
     protected function guard()
     {
         return Auth::guard('report');
+    }
+
+    protected function getAppid(){
+        $user = $this->guard()->user();
+        return isset($user['appid']) ? $user['appid'] : 0;
     }
 
     /**
