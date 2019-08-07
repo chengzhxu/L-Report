@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Http\Service\RegionCodeService;
 use App\Http\Service\ReportService;
 use Illuminate\Http\Request;
 
@@ -134,6 +135,61 @@ class ReportController extends ReportAbstract {
         return $this->toJson(200, $result, '操作成功');
     }
 
+    /**
+     * 获取uv历史数据
+     */
+    public function getHistoryUv(){
+        $region_code = Q($this->request, 'region_code');
+        $time_start = Q($this->request, 'time_start');
+        $time_end = Q($this->request, 'time_end');
 
+        $result = $this->_service->getHistoryUv($this->_appid, $region_code, $time_start, $time_end);
+        switch ($result){
+            case -1:
+                return $this->toJson(401, [], '请选择开始时间');
+                break;
+            case -2:
+                return $this->toJson(401, [], '请选择结束时间');
+                break;
+            case -3:
+                return $this->toJson(401, [], '结束时间必须大于开始时间');
+                break;
+            case -4:
+                return $this->toJson(401, [], '日期间隔不能超过三个月');
+                break;
+        }
+
+        return $this->toJson(200, $result, '操作成功');
+    }
+
+
+
+
+    /**
+     * 获取地域列表
+    */
+    public function getRegionList(){
+        $region_type = Q($this->request, 'region_type');
+        $words = Q($this->request, 'words');
+
+        $region_list = [];
+        $province_list = [];
+
+        $regionService = app()->make(RegionCodeService::class);
+        switch ($region_type){
+            case 1:      //城市list
+                $region_list = $regionService->getRegionList('region_name', $words);
+                break;
+            case 2:
+                $province_list = $regionService->getProvinceList('province_name', $words);
+                break;
+            default:
+                $region_list = $regionService->getRegionList('region_name', $words);
+                $province_list = $regionService->getProvinceList('province_name', $words);
+        }
+        $result = ['region_list' => $region_list, 'province_list' => $province_list];
+
+        return $this->toJson(200, $result, '操作成功');
+    }
 
 }

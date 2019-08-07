@@ -200,6 +200,11 @@ class ReportService {
                     return -3;
                 }
 
+                $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
+                if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
+                    return -4;
+                }
+
                 $start_day = date('Ymd',$second_start);
                 $end_day = date('Ymd',$second_end);
 
@@ -213,26 +218,24 @@ class ReportService {
                 }
             }
         }
-        if($day_count > 93){
-            return -4;
-        }
 
+        $regionService = app()->make(RegionCodeService::class);
+        $region_name = '全国';
         if($region_code){
             $where['regioncode'] = $region_code;
+            $region = $regionService->getRegionByCode($region_code);
+            $region_name = Q($region, 'region_name');
         }
 
-        $res = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->orderBy('day', 'desc')->get(['day', 'times as num', 'regioncode'])->toArray();
-
+        $res = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('SUM(times) as num')])->toArray();
         $total_pv = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->sum('times');
 //        if(!empty($res))
 //        {
-//            $res = collect($res)->toArray();
-//            $regionService = app()->make(RegionCodeService::class);
 //            foreach ($res as $key => &$val){
 //                if(!is_array($val)){
 //                    $val = (array)$val;
 //                }
-//                $total_pv += intval($val['num']);
+////                $total_pv += intval($val['num']);
 //                $region = $regionService->getRegionByCode(Q($val, 'regioncode'));
 //                $val['region_name'] = Q($region, 'region_name');
 //            }
@@ -240,7 +243,67 @@ class ReportService {
         $result = [
             'total_pv' => $total_pv,
             'day_pv' => round($total_pv / $day_count, 2),
+            'region_name' => $region_name,
             'pv_data' => $res,
+        ];
+
+        return $result;
+    }
+
+    /**
+     * 获取uv历史数据
+     */
+    public function getHistoryUv($app_id = 0, $region_code = '', $time_start = '', $time_end = ''){
+        $day_count = 7;
+        $where = [
+            'appid' => $app_id
+        ];
+        if(!$time_start && !$time_end){
+            $start_day = date('Ymd',time());
+            $end_day = date('Ymd',strtotime("-7 day"));
+        }else{
+            if($time_start && $time_end){
+                $second_start = strtotime($time_start);
+                $second_end = strtotime($time_end);
+
+                if($second_end < $second_start){
+                    return -3;
+                }
+
+                $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
+                if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
+                    return -4;
+                }
+
+                $start_day = date('Ymd',$second_start);
+                $end_day = date('Ymd',$second_end);
+
+                $day_count = ($second_end - $second_start) / 86400;
+            }else{
+                if(!$time_start){
+                    return -1;
+                }
+                if(!$time_end){
+                    return -2;
+                }
+            }
+        }
+
+        $regionService = app()->make(RegionCodeService::class);
+        $region_name = '全国';
+        if($region_code){
+            $where['regioncode'] = $region_code;
+            $region = $regionService->getRegionByCode($region_code);
+            $region_name = Q($region, 'region_name');
+        }
+
+        $res = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('SUM(uv) as num')])->toArray();
+        $total_uv = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->sum('uv');
+        $result = [
+            'total_uv' => $total_uv,
+            'day_uv' => round($total_uv / $day_count, 2),
+            'region_name' => $region_name,
+            'uv_data' => $res,
         ];
 
         return $result;

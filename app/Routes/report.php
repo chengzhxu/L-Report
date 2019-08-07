@@ -26,6 +26,9 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.rep
     Route::any('report/get_region_pv_by_day', 'ReportController@getRegionPvByDay');
     Route::any('report/get_uv_by_day', 'ReportController@getUvByDay');
     Route::any('report/get_history_pv', 'ReportController@getHistoryPv');
+    Route::any('report/get_history_uv', 'ReportController@getHistoryUv');
+
+    Route::any('report/get_region_list', 'ReportController@getRegionList');
 
     Route::any('report/test', 'ReportController@test');
     Route::any('report/get_cpanel_group', 'ReportController@getCpanelGroup');
