@@ -10,11 +10,10 @@ use Illuminate\Http\Request;
 class ReportController extends ReportAbstract {
 
     protected $_service;
-    protected $request;
     protected $_appid;
 
     public function __construct(Request $request){
-        $this->request = $request;
+        parent::__construct($request);
 
         $this->_service = app()->make(ReportService::class);
         $this->_appid = $this->getAppid();
