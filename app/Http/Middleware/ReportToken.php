@@ -17,7 +17,7 @@ class ReportToken
     public function handle($request, Closure $next)
     {
         if (Auth::guard('report')->guest()) {
-            return response()->json(['code' => 300,'message' => '无效的token信息']);
+            return response()->json(['code' => 3000,'message' => '无效的token信息']);
         }
 
         return $next($request);

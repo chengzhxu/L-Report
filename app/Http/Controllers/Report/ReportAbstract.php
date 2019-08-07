@@ -48,7 +48,9 @@ class ReportAbstract extends BaseController{
      * @return Response
      */
     public function toJson($code = 200, $data = null, $message = ''){
-
+        if(!$message){
+            $message = get_code_msg($code);
+        }
         return new JsonResponse(['code' => $code, 'data' => $data, 'message' => $message]);
     }
 }

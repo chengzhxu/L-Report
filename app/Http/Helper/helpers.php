@@ -57,6 +57,20 @@ if(!function_exists('diffDate')){
     }
 }
 
+if(!function_exists('get_code_msg')){
+    function get_code_msg($code){
+        if(!$code){
+            return '';
+        }
+        $code_cfg = config('msg_code');
+        foreach ($code_cfg as $c){
+            if($c['code'] == $code){
+                return $c['message'];
+            }
+        }
+    }
+}
+
 
 if(!function_exists('array_combine_v')){
     function array_combine_v($arr1, $arr2){
