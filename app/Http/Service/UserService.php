@@ -16,9 +16,6 @@ class UserService {
     }
 
     public function checkLogin($data = []){
-        $code = 200;
-        $msg = '登录成功';
-
         if(Q($data, 'username') && Q($data, 'password')){
             $where = [
                 'username' => Q($data, 'username')
@@ -26,13 +23,12 @@ class UserService {
             $user = $this->_model->where($where)->first();
             $pwd = md5(Q($data, 'password').Q($user, 'salt'));
             if($user && $pwd == Q($user, 'password')){
-                $token = strtoupper(md5(Q($user, 'username').time()));
-                if($this->_model->where($where)->update(['api_token' => $token])){
-                    $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid']);
-
-                    return $user;
+                if(!Q($user, 'api_token')){
+                    $token = strtoupper(md5(Q($user, 'username').time()));
+                    $this->_model->where($where)->update(['api_token' => $token]);
                 }
-                return false;
+                $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid']);
+                return $user;
             }else{
                 return false;
             }

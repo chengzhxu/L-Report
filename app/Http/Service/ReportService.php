@@ -129,8 +129,8 @@ class ReportService {
 
         $sql = ' select day, uv AS num from day_app_uv_stat where appid = ' . $app_id;
         if(!$time_start && !$time_end){
-            $start_day = date('Ymd',time());
-            $end_day = date('Ymd',strtotime("-7 day"));
+            $start_day = date('Ymd',strtotime("-7 day"));
+            $end_day = date('Ymd',time());
             $sql .= ' and day between ' . $start_day . ' and ' . $end_day;
         }else{
             if($time_start && $time_end){
@@ -189,35 +189,36 @@ class ReportService {
             'appid' => $app_id
         ];
         if(!$time_start && !$time_end){
-            $start_day = date('Ymd',time());
-            $end_day = date('Ymd',strtotime("-7 day"));
+            $start_day = date('Ymd',strtotime("-7 day"));
+            $end_day = date('Ymd',time());
+        }
+        if($time_start && $time_end){
+            $second_start = strtotime($time_start);
+            $second_end = strtotime($time_end);
+
+            if($second_end < $second_start){
+                return -3;
+            }
+
+            $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
+            if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
+                return -4;
+            }
+
+            $start_day = date('Ymd',$second_start);
+            $end_day = date('Ymd',$second_end);
+
+            $day_count = ($second_end - $second_start) / 86400;
         }else{
-            if($time_start && $time_end){
-                $second_start = strtotime($time_start);
-                $second_end = strtotime($time_end);
-
-                if($second_end < $second_start){
-                    return -3;
-                }
-
-                $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
-                if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
-                    return -4;
-                }
-
-                $start_day = date('Ymd',$second_start);
-                $end_day = date('Ymd',$second_end);
-
-                $day_count = ($second_end - $second_start) / 86400;
-            }else{
-                if(!$time_start){
-                    return -1;
-                }
-                if(!$time_end){
-                    return -2;
-                }
+            if(!$time_start){
+                return -1;
+            }
+            if(!$time_end){
+                return -2;
             }
         }
+
+        $date_list = $this->transeDateList($start_day, $end_day);
 
         $regionService = app()->make(RegionCodeService::class);
         $region_name = '全国';
@@ -227,7 +228,7 @@ class ReportService {
             $region_name = Q($region, 'region_name');
         }
 
-        $res = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('SUM(times) as num')])->toArray();
+        $res = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(times), 0) as num')])->toArray();
         $total_pv = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->sum('times');
 //        if(!empty($res))
 //        {
@@ -240,11 +241,30 @@ class ReportService {
 //                $val['region_name'] = Q($region, 'region_name');
 //            }
 //        }
+
+        $pv_data = [];
+        foreach ($date_list as $d){
+            $ie = 0;
+            foreach ($res as $r){
+                if(Q($r, 'day') == $d){
+                    $ie = 1;
+                    $r->ask_num = '暂不支持';
+                    $r->send_num = '暂不支持';
+                    array_push($pv_data, $r);
+                    break;
+                }
+            }
+            if($ie == 0){
+                $uv = ['day' => $d, 'num' => 0, 'ask_num' => '暂不支持', 'send_num' => '暂不支持'];
+                array_push($pv_data, $uv);
+            }
+        }
+
         $result = [
             'total_pv' => $total_pv,
             'day_pv' => round($total_pv / $day_count, 2),
             'region_name' => $region_name,
-            'pv_data' => $res,
+            'pv_data' => $pv_data,
         ];
 
         return $result;
@@ -259,35 +279,34 @@ class ReportService {
             'appid' => $app_id
         ];
         if(!$time_start && !$time_end){
-            $start_day = date('Ymd',time());
-            $end_day = date('Ymd',strtotime("-7 day"));
+            $start_day = date('Ymd',strtotime("-7 day"));
+            $end_day = date('Ymd',time());
+        }
+        if($time_start && $time_end){
+            $second_start = strtotime($time_start);
+            $second_end = strtotime($time_end);
+
+            if($second_end < $second_start){
+                return -3;
+            }
+
+            $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
+            if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
+                return -4;
+            }
+
+            $start_day = date('Ymd',$second_start);
+            $end_day = date('Ymd',$second_end);
+            $day_count = ($second_end - $second_start) / 86400;
         }else{
-            if($time_start && $time_end){
-                $second_start = strtotime($time_start);
-                $second_end = strtotime($time_end);
-
-                if($second_end < $second_start){
-                    return -3;
-                }
-
-                $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
-                if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
-                    return -4;
-                }
-
-                $start_day = date('Ymd',$second_start);
-                $end_day = date('Ymd',$second_end);
-
-                $day_count = ($second_end - $second_start) / 86400;
-            }else{
-                if(!$time_start){
-                    return -1;
-                }
-                if(!$time_end){
-                    return -2;
-                }
+            if(!$time_start){
+                return -1;
+            }
+            if(!$time_end){
+                return -2;
             }
         }
+        $date_list = $this->transeDateList($start_day, $end_day);
 
         $regionService = app()->make(RegionCodeService::class);
         $region_name = '全国';
@@ -297,13 +316,31 @@ class ReportService {
             $region_name = Q($region, 'region_name');
         }
 
-        $res = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('SUM(uv) as num')])->toArray();
+        $res = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(uv),0) as num')])->toArray();
         $total_uv = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->sum('uv');
+        $uv_data = [];
+        foreach ($date_list as $d){
+            $ie = 0;
+            foreach ($res as $r){
+                if(Q($r, 'day') == $d){
+                    $ie = 1;
+                    $r->ask_num = '暂不支持';
+                    $r->send_num = '暂不支持';
+                    array_push($uv_data, $r);
+                    break;
+                }
+            }
+            if($ie == 0){
+                $uv = ['day' => $d, 'num' => 0, 'ask_num' => '暂不支持', 'send_num' => '暂不支持'];
+                array_push($uv_data, $uv);
+            }
+        }
+
         $result = [
             'total_uv' => $total_uv,
             'day_uv' => round($total_uv / $day_count, 2),
             'region_name' => $region_name,
-            'uv_data' => $res,
+            'uv_data' => $uv_data,
         ];
 
         return $result;
@@ -356,5 +393,28 @@ class ReportService {
     */
     public function getAppRegionNuv(){
 
+    }
+
+
+    /**
+     *
+    */
+    private function transeDateList($start_day = '', $end_day = ''){
+        $date_list = [];
+        if($start_day && $end_day){
+            $start_time = strtotime($start_day);
+            $end_time = strtotime($end_day);
+            $current_time = $start_time;
+            array_push($date_list, date('Ymd',$start_time));
+            while ($current_time < $end_time){
+                $current_time += 1*24*60*60;
+                array_push($date_list, date('Ymd',$current_time));
+            }
+            if(!in_array(date('Ymd',$end_time), $date_list)){
+                array_push($date_list, date('Ymd',$end_time));
+            }
+        }
+
+        return $date_list;
     }
 }

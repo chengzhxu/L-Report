@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Cors;
 use App\Http\Middleware\ReportToken;
 use Encore\Admin\AdminServiceProvider;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
