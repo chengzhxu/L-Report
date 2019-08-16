@@ -4,6 +4,7 @@
 namespace App\Http\Service;
 
 
+use App\Http\Model\RegionAppCategoryModel;
 use App\Http\Model\RegionCodeModel;
 use Illuminate\Support\Facades\DB;
 
@@ -21,7 +22,7 @@ class RegionCodeService {
         $result = [];
 
         if($region_code){
-            $result = $this->_model->where(['regioncode' => $region_code])->first()->toArray();
+            $result = $this->_model->where(['regioncode' => $region_code])->first();
         }
 
         return $result;
@@ -53,6 +54,120 @@ class RegionCodeService {
             array_push($where, [$col, 'like', '%'.$val.'%']);
         }
         $result = DB::table('t_province_code')->where($where)->get()->toArray();
+
+        return $result;
+    }
+
+    /**
+     * 获取当前APP用户下的分类城市信息
+    */
+    public function getCategoryRegionList($appid = 0, $category_id = 0, $page_size = 0, $words = ''){
+        $where['c.appid'] = $appid;
+        if($words){
+            array_push($where, ['r.region_name', 'like', '%'.$words.'%']);
+        }
+        if($category_id){
+            $where['category_id'] = $category_id;
+        }
+        $columns = ['c.*', 'r.region_name', 'l.name as category_name'];
+
+        if($page_size){
+            $result = DB::table('region_app_category as c')
+                ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
+                ->join('region_category as l', 'c.category_id', '=', 'l.id')
+                ->where($where)->select($columns)->paginate($page_size);
+        }else{
+            $result = DB::table('region_app_category as c')
+                ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
+                ->join('region_category as l', 'c.category_id', '=', 'l.id')
+                ->where($where)->get($columns);
+        }
+
+
+        return $result;
+    }
+
+    /**
+     * 获取指定城市等级信息
+     * @param appid
+     * @param region_code
+     * @return category
+    */
+    public function getCategoryByAppRegion($appid = 0, $region_code = ''){
+        if($appid && $region_code){
+            $where = [
+                'appid' => $appid,
+                'region_code' => $region_code
+            ];
+            return DB::table('region_app_category')->where($where)->first();
+        }
+    }
+
+    /**
+     * 新增城市等级信息
+    */
+    public function addCategoryRegion($category = []){
+        $entity = new RegionAppCategoryModel($category);
+
+        return $entity->save($category) ? $this->getCategoryRegionInfo($entity->id) : [];
+    }
+
+    /**
+     * 获取城市等级信息
+     */
+    public function getCategoryRegionInfo($id = 0){
+        $columns = ['c.*', 'r.region_name', 'l.name as category_name'];
+        return DB::table('region_app_category as c')
+            ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
+            ->join('region_category as l', 'c.category_id', '=', 'l.id')
+            ->where('c.id', $id)->first($columns);
+    }
+
+    /**
+     * 更新城市等级信息
+    */
+    public function updateCategoryRegionInfo($region_id = 0, $category = []){
+        if($region_id && $category){
+            unset($category['id']);
+
+            return RegionAppCategoryModel::where('id', $region_id)->update($category);
+        }
+    }
+
+    /**
+     * 删除城市等级信息
+    */
+    public function delCategoryRegionInfo($region_id = 0){
+        if($region_id){
+            return RegionAppCategoryModel::where('id', $region_id)->delete();
+        }
+    }
+
+    /**
+     * 获取等级分类列表
+    */
+    public function getRegionCategoryList(){
+        $result = DB::table('region_category')->get()->toArray();
+
+        return $result ? $result : [];
+    }
+
+    /**
+     * 根据城市等级和获取相关渠道的城市信息
+     * @param appid
+     * @param category_id
+     * @return array
+    */
+    public function getRegionByCategory($appid = 0, $category_id = 0){
+        $result = [];
+        if($appid){
+            $where['appid'] = $appid;
+            if($category_id){
+                $where['category_id'] = $category_id;
+            }
+            $result = DB::table('region_app_category')->join('t_region_code', 'region_app_category.region_code', '=', 't_region_code.regioncode')
+                ->where($where)->get(['region_app_category.*', 't_region_code.region_name'])->toArray();
+        }
 
         return $result;
     }

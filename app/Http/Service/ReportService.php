@@ -183,14 +183,14 @@ class ReportService {
     /**
      * 获取pv历史数据
      */
-    public function getHistoryPv($app_id = 0, $region_code = '', $time_start = '', $time_end = ''){
+    public function getHistoryPv($app_id = 0, $category_id, $region_code = '', $time_start = '', $time_end = ''){
         $day_count = 7;
         $where = [
             'appid' => $app_id
         ];
         if(!$time_start && !$time_end){
-            $start_day = date('Ymd',strtotime("-7 day"));
-            $end_day = date('Ymd',time());
+            $start_day = $time_start = date('Ymd',strtotime("-7 day"));
+            $end_day = $time_end = date('Ymd',time());
         }
         if($time_start && $time_end){
             $second_start = strtotime($time_start);
@@ -222,25 +222,25 @@ class ReportService {
 
         $regionService = app()->make(RegionCodeService::class);
         $region_name = '全国';
+        $regioncodes = [];
+        if($category_id){
+            $region_list = app()->make(RegionCodeService::class)->getRegionByCategory($app_id, $category_id);
+            $regioncodes = array_column($region_list, 'region_code');
+            $region_name = DB::table('region_category')->where('id', $category_id)->value('name');
+        }
         if($region_code){
-            $where['regioncode'] = $region_code;
+            $regioncodes = [$region_code];
             $region = $regionService->getRegionByCode($region_code);
             $region_name = Q($region, 'region_name');
         }
 
-        $res = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(times), 0) as num')])->toArray();
-        $total_pv = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->sum('times');
-//        if(!empty($res))
-//        {
-//            foreach ($res as $key => &$val){
-//                if(!is_array($val)){
-//                    $val = (array)$val;
-//                }
-////                $total_pv += intval($val['num']);
-//                $region = $regionService->getRegionByCode(Q($val, 'regioncode'));
-//                $val['region_name'] = Q($region, 'region_name');
-//            }
-//        }
+        $query = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day]);
+        if($regioncodes){
+            $query->whereIn('regioncode', $regioncodes);
+        }
+
+        $res = $query->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(times), 0) as num')])->toArray();
+        $total_pv = $query->sum('times');
 
         $pv_data = [];
         foreach ($date_list as $d){
@@ -273,14 +273,14 @@ class ReportService {
     /**
      * 获取uv历史数据
      */
-    public function getHistoryUv($app_id = 0, $region_code = '', $time_start = '', $time_end = ''){
+    public function getHistoryUv($app_id = 0, $category_id, $region_code = '', $time_start = '', $time_end = ''){
         $day_count = 7;
         $where = [
             'appid' => $app_id
         ];
         if(!$time_start && !$time_end){
-            $start_day = date('Ymd',strtotime("-7 day"));
-            $end_day = date('Ymd',time());
+            $start_day = $time_start = date('Ymd',strtotime("-7 day"));
+            $end_day = $time_end = date('Ymd',time());
         }
         if($time_start && $time_end){
             $second_start = strtotime($time_start);
@@ -310,14 +310,26 @@ class ReportService {
 
         $regionService = app()->make(RegionCodeService::class);
         $region_name = '全国';
+        $regioncodes = [];
+        if($category_id){
+            $region_list = app()->make(RegionCodeService::class)->getRegionByCategory($app_id, $category_id);
+            $regioncodes = array_column($region_list, 'region_code');
+            $region_name = DB::table('region_category')->where('id', $category_id)->value('name');
+        }
         if($region_code){
-            $where['regioncode'] = $region_code;
+            $regioncodes = [$region_code];
             $region = $regionService->getRegionByCode($region_code);
             $region_name = Q($region, 'region_name');
         }
 
-        $res = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(uv),0) as num')])->toArray();
-        $total_uv = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day])->sum('uv');
+        $query = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day]);
+
+        if($regioncodes){
+            $query->whereIn('regioncode', $regioncodes);
+        }
+
+        $res = $query->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(uv),0) as num')])->toArray();
+        $total_uv = $query->sum('uv');
         $uv_data = [];
         foreach ($date_list as $d){
             $ie = 0;
@@ -349,7 +361,7 @@ class ReportService {
     /**
      * 获取地域pv数据
     */
-    public function getRegionPv($app_id = 0, $region_code = '', $time_start = '', $time_end = '', $page_size = 10){
+    public function getRegionPv($app_id = 0, $category_id, $region_code = '', $time_start = '', $time_end = '', $page_size = 10){
         $query = AppRegionPvModel::with('regionCode')->where('appid', $app_id);
         if($region_code){
             $query = $query->where('regioncode', $region_code);
