@@ -63,6 +63,16 @@ class ReportService {
     }
 
     /**
+     * 获取渠道列表
+    */
+    public function getAppList(){
+        $sql = 'select appid, title from cpanel_app ';
+        $t_res = DB::connection('online_v2_cpanel')->select($sql);
+
+        return $t_res ? $t_res : [];
+    }
+
+    /**
      * 获取指定日期相关pv数据
      */
     public function getRegionPvByDay($app_id = 0, $region_code = '', $time_start = '', $time_end = ''){
@@ -333,7 +343,7 @@ class ReportService {
         if($time_start && $time_end){
             $second_start = strtotime($time_start);
             $second_end = strtotime($time_end);
-            if($second_end < $second_start){
+            if($second_end < $second_start || $second_end == $second_start){
                 return -3;
             }
             if($second_end > time()){

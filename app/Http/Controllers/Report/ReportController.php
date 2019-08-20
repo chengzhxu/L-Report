@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Report;
 use App\Http\Service\RegionCodeService;
 use App\Http\Service\ReportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends ReportAbstract {
 
@@ -19,6 +20,11 @@ class ReportController extends ReportAbstract {
         $this->_service = app()->make(ReportService::class);
         $this->_regionService = app()->make(RegionCodeService::class);
         $this->_appid = $this->getAppid();
+
+        $user = Auth::guard('report')->user();
+        if(!$this->_appid && $user['username'] == 'admin'){
+            $this->_appid = Q($this->request, 'appid');
+        }
     }
 
     /**
@@ -26,6 +32,15 @@ class ReportController extends ReportAbstract {
     */
     public function getRealTimeData(){
         $result = $this->_service->getRealTimeData($this->_appid);
+
+        return $this->toJson(200, $result);
+    }
+
+    /**
+     * 获取渠道列表信息
+    */
+    public function getAppList(){
+        $result = $this->_service->getAppList();
 
         return $this->toJson(200, $result);
     }
@@ -307,6 +322,9 @@ class ReportController extends ReportAbstract {
         }
         if(!Q($data, 'region_code')){
             return 5002;
+        }
+        if(!Q($data, 'appid')){
+            return 5011;
         }
         if(!$this->_regionService->getRegionByCode(Q($data, 'region_code'))){
             return 5008;
