@@ -323,7 +323,7 @@ class ReportController extends ReportAbstract {
         if(!Q($data, 'region_code')){
             return 5002;
         }
-        if(!Q($data, 'appid')){
+        if(!$this->_appid){
             return 5011;
         }
         if(!$this->_regionService->getRegionByCode(Q($data, 'region_code'))){
