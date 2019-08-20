@@ -78,7 +78,7 @@ class RegionCodeService {
             if(Q($cate, 'id') == 99){    //B类城市
                 $regions = '其他';
             }
-            $res['region_list'] = $regions;
+            $res['region_list'] = $regions ? $regions : '无';
 
             $result[] = $res;
         }
