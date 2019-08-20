@@ -125,6 +125,9 @@ class ReportController extends ReportAbstract {
                 return $this->toJson(4003, []);
                 break;
             case -4:
+                return $this->toJson(4004, []);
+                break;
+            case -5:
                 return $this->toJson(4005, []);
                 break;
         }
@@ -151,6 +154,9 @@ class ReportController extends ReportAbstract {
                 return $this->toJson(4003, []);
                 break;
             case -4:
+                return $this->toJson(4004, []);
+                break;
+            case -5:
                 return $this->toJson(4005, []);
                 break;
         }

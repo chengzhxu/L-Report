@@ -336,9 +336,12 @@ class ReportService {
             if($second_end < $second_start){
                 return -3;
             }
+            if($second_end > time()){
+                return -4;
+            }
             $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
             if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
-                return -4;
+                return -5;
             }
             $this->start_day = date('Ymd',$second_start);
             $this->end_day = date('Ymd',$second_end);
