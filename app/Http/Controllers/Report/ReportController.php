@@ -110,12 +110,10 @@ class ReportController extends ReportAbstract {
      * 获取pv历史数据
      */
     public function getHistoryPv(){
-        $region_code = Q($this->request, 'region_code');
-        $category_id = Q($this->request, 'category_id');
         $time_start = Q($this->request, 'time_start');
         $time_end = Q($this->request, 'time_end');
 
-        $result = $this->_service->getHistoryPv($this->_appid, $category_id, $region_code, $time_start, $time_end);
+        $result = $this->_service->getHistoryPv($this->_appid, $time_start, $time_end);
         switch ($result){
             case -1:
                 return $this->toJson(4001, []);
@@ -138,12 +136,10 @@ class ReportController extends ReportAbstract {
      * 获取uv历史数据
      */
     public function getHistoryUv(){
-        $region_code = Q($this->request, 'region_code');
-        $category_id = Q($this->request, 'category_id');
         $time_start = Q($this->request, 'time_start');
         $time_end = Q($this->request, 'time_end');
 
-        $result = $this->_service->getHistoryUv($this->_appid, $category_id, $region_code, $time_start, $time_end);
+        $result = $this->_service->getHistoryUv($this->_appid, $time_start, $time_end);
         switch ($result){
             case -1:
                 return $this->toJson(4001, []);
@@ -192,10 +188,7 @@ class ReportController extends ReportAbstract {
      * 获取当前APP的城市信息
     */
     public function getCategoryRegionList(){
-        $words = Q($this->request, 'words');
-        $category_id = Q($this->request, 'category_id');
-        $page_size = Q($this->request, 'page_size');
-        $result = $this->_regionService->getCategoryRegionList($this->_appid, $category_id, $page_size, $words);
+        $result = $this->_regionService->getCategoryRegionList($this->_appid);
 
         return $this->toJson(200, $result);
     }

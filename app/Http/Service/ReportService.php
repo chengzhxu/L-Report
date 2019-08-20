@@ -6,9 +6,16 @@ namespace App\Http\Service;
 
 use App\Http\Model\AppRegionPvModel;
 use App\Http\Model\AppRegionUvModel;
+use App\Http\Model\RegionAppCategoryModel;
+use App\Http\Model\RegionCategoryModel;
 use Illuminate\Support\Facades\DB;
 
 class ReportService {
+
+    protected $end_day = '';
+    protected $start_day = '';
+    protected $day_count = 7;
+
     /**
      * 获取当日实时数据快报
     */
@@ -183,64 +190,20 @@ class ReportService {
     /**
      * 获取pv历史数据
      */
-    public function getHistoryPv($app_id = 0, $category_id, $region_code = '', $time_start = '', $time_end = ''){
-        $day_count = 7;
+    public function getHistoryPv($app_id = 0, $time_start = '', $time_end = ''){
         $where = [
             'appid' => $app_id
         ];
-        if(!$time_start && !$time_end){
-            $start_day = $time_start = date('Ymd',strtotime("-7 day"));
-            $end_day = $time_end = date('Ymd',time());
-        }
-        if($time_start && $time_end){
-            $second_start = strtotime($time_start);
-            $second_end = strtotime($time_end);
 
-            if($second_end < $second_start){
-                return -3;
-            }
-
-            $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
-            if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
-                return -4;
-            }
-
-            $start_day = date('Ymd',$second_start);
-            $end_day = date('Ymd',$second_end);
-
-            $day_count = ($second_end - $second_start) / 86400;
-        }else{
-            if(!$time_start){
-                return -1;
-            }
-            if(!$time_end){
-                return -2;
-            }
+        $res = $this->validateSearchDate($time_start, $time_end);
+        if($res !== true){
+            return $res;
         }
 
-        $date_list = $this->transeDateList($start_day, $end_day);
+        $date_list = $this->transeDateList($this->start_day, $this->end_day);
 
-        $regionService = app()->make(RegionCodeService::class);
-        $region_name = '全国';
-        $regioncodes = [];
-        if($category_id){
-            $region_list = app()->make(RegionCodeService::class)->getRegionByCategory($app_id, $category_id);
-            $regioncodes = array_column($region_list, 'region_code');
-            $region_name = DB::table('region_category')->where('id', $category_id)->value('name');
-        }
-        if($region_code){
-            $regioncodes = [$region_code];
-            $region = $regionService->getRegionByCode($region_code);
-            $region_name = Q($region, 'region_name');
-        }
-
-        $query = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$start_day, $end_day]);
-        if($regioncodes){
-            $query->whereIn('regioncode', $regioncodes);
-        }
-
-        $res = $query->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(times), 0) as num')])->toArray();
-        $total_pv = $query->sum('times');
+        $res = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$this->start_day, $this->end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(times), 0) as num')])->toArray();
+        $total_pv = DB::table('day_group_app_region_pv_stat')->where($where)->whereBetween('day', [$this->start_day, $this->end_day])->sum('times');
 
         $pv_data = [];
         foreach ($date_list as $d){
@@ -260,11 +223,33 @@ class ReportService {
             }
         }
 
+        $cate_list = RegionCategoryModel::all();
+        $chart_list = [
+            'total_chart' => []
+        ];
+
+        $title_list = ['日期','请求量','下发量', '曝光量'];
+        foreach ($cate_list as $cate){
+            array_push($title_list, $cate['name']);
+            $chart_list[substr($cate['name'],0, 1) . '_chart'] = [];
+        }
+
+        foreach ($pv_data as $key=> $val){
+            if(!is_array($val)){
+                $val = (array)$val;
+            }
+            array_push($chart_list['total_chart'], intval(Q($val, 'num')));
+            $res = $this->getCategoryHistoryData($val, 'day_group_app_region_pv_stat', 'times', $where, $app_id, Q($val, 'day'), $cate_list, $chart_list);
+            $pv_data[$key] = Q($res, 'data');
+            $chart_list = Q($res, 'chart');
+        }
+
         $result = [
             'total_pv' => $total_pv,
-            'day_pv' => round($total_pv / $day_count, 2),
-            'region_name' => $region_name,
+            'day_pv' => round($total_pv / $this->day_count, 2),
             'pv_data' => $pv_data,
+            'title_list' => $title_list,
+            'chart_list' => $chart_list
         ];
 
         return $result;
@@ -273,63 +258,20 @@ class ReportService {
     /**
      * 获取uv历史数据
      */
-    public function getHistoryUv($app_id = 0, $category_id, $region_code = '', $time_start = '', $time_end = ''){
-        $day_count = 7;
+    public function getHistoryUv($app_id = 0, $time_start = '', $time_end = ''){
         $where = [
             'appid' => $app_id
         ];
-        if(!$time_start && !$time_end){
-            $start_day = $time_start = date('Ymd',strtotime("-7 day"));
-            $end_day = $time_end = date('Ymd',time());
-        }
-        if($time_start && $time_end){
-            $second_start = strtotime($time_start);
-            $second_end = strtotime($time_end);
 
-            if($second_end < $second_start){
-                return -3;
-            }
-
-            $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
-            if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
-                return -4;
-            }
-
-            $start_day = date('Ymd',$second_start);
-            $end_day = date('Ymd',$second_end);
-            $day_count = ($second_end - $second_start) / 86400;
-        }else{
-            if(!$time_start){
-                return -1;
-            }
-            if(!$time_end){
-                return -2;
-            }
-        }
-        $date_list = $this->transeDateList($start_day, $end_day);
-
-        $regionService = app()->make(RegionCodeService::class);
-        $region_name = '全国';
-        $regioncodes = [];
-        if($category_id){
-            $region_list = app()->make(RegionCodeService::class)->getRegionByCategory($app_id, $category_id);
-            $regioncodes = array_column($region_list, 'region_code');
-            $region_name = DB::table('region_category')->where('id', $category_id)->value('name');
-        }
-        if($region_code){
-            $regioncodes = [$region_code];
-            $region = $regionService->getRegionByCode($region_code);
-            $region_name = Q($region, 'region_name');
+        $res = $this->validateSearchDate($time_start, $time_end);
+        if($res !== true){
+            return $res;
         }
 
-        $query = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$start_day, $end_day]);
+        $date_list = $this->transeDateList($this->start_day, $this->end_day);
 
-        if($regioncodes){
-            $query->whereIn('regioncode', $regioncodes);
-        }
-
-        $res = $query->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(uv),0) as num')])->toArray();
-        $total_uv = $query->sum('uv');
+        $res = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$this->start_day, $this->end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(uv),0) as num')])->toArray();
+        $total_uv = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$this->start_day, $this->end_day])->sum('uv');
         $uv_data = [];
         foreach ($date_list as $d){
             $ie = 0;
@@ -348,15 +290,108 @@ class ReportService {
             }
         }
 
+        $cate_list = RegionCategoryModel::all();
+        $chart_list = [
+            'total_chart' => []
+        ];
+
+        $title_list = ['日期','请求量','下发量', '曝光量'];
+        foreach ($cate_list as $cate){
+            array_push($title_list, $cate['name']);
+            $chart_list[substr($cate['name'],0, 1) . '_chart'] = [];
+        }
+
+        foreach ($uv_data as $key=> $val){
+            if(!is_array($val)){
+                $val = (array)$val;
+            }
+            array_push($chart_list['total_chart'], intval(Q($val, 'num')));
+            $res = $this->getCategoryHistoryData($val, 'day_group_app_region_uv_stat', 'uv', $where, $app_id, Q($val, 'day'), $cate_list, $chart_list);
+            $uv_data[$key] = Q($res, 'data');
+            $chart_list = Q($res, 'chart');
+        }
+
         $result = [
             'total_uv' => $total_uv,
-            'day_uv' => round($total_uv / $day_count, 2),
-            'region_name' => $region_name,
+            'day_uv' => round($total_uv / $this->day_count, 2),
             'uv_data' => $uv_data,
+            'title_list' => $title_list,
+            'chart_list' => $chart_list
         ];
 
         return $result;
     }
+
+    /**
+     * 验证搜索日期
+    */
+    private function validateSearchDate($time_start, $time_end){
+        if(!$time_start && !$time_end){
+            $this->start_day = $time_start = date('Ymd',strtotime("-7 day"));
+            $this->end_day = $time_end = date('Ymd',time());
+        }
+        if($time_start && $time_end){
+            $second_start = strtotime($time_start);
+            $second_end = strtotime($time_end);
+            if($second_end < $second_start){
+                return -3;
+            }
+            $diff = diffDate(date('Y-m-d',$second_start), date('Y-m-d',$second_end));
+            if(Q($diff, 'year') > 0 || (Q($diff, 'month') > 2 && Q($diff, 'day') > 0)){
+                return -4;
+            }
+            $this->start_day = date('Ymd',$second_start);
+            $this->end_day = date('Ymd',$second_end);
+
+            $this->day_count = ($second_end - $second_start) / 86400;
+        }else{
+            if(!$time_start){
+                return -1;
+            }
+            if(!$time_end){
+                return -2;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 获取指定条件不同城市等级下的相关数据
+    */
+    private function getCategoryHistoryData($data, $table, $col = '', $where, $app_id, $day, $cate_list, $chart_list = []){
+        $exist_region = [];
+        $where['day'] = $day;
+        foreach ($cate_list as $cate){
+            $res = [];
+            $regioncodes  = RegionAppCategoryModel::where(['category_id' => Q($cate, 'id'), 'appid' => $app_id])->pluck('region_code')->toArray();
+
+            if($regioncodes){
+                $exist_region = array_merge($exist_region, $regioncodes);
+                $res = DB::table($table)->where($where)->whereIn('regioncode', $regioncodes)->get([DB::raw("IFNULL(SUM($col), 0) as num")])->toArray();
+            }
+
+            if(Q($cate, 'id') == 99){    //B类城市  其他
+                $res = DB::table($table)->where($where)->whereNotIn('regioncode', $exist_region)->get([DB::raw("IFNULL(SUM($col), 0) as num")])->toArray();
+            }
+
+            $c = substr($cate['name'],0, 1);
+            $key = $c . '_num';
+            $num = 0;
+            if($res && $res[0]){
+                $num = $res[0]->num;
+            }
+            $s_chart = $c . '_chart';
+            array_push($chart_list[$s_chart], intval($num));
+
+            $data[$key] = intval($num);
+        }
+
+        return ['data' => $data, 'chart' => $chart_list];
+    }
+
+
 
     /**
      * 获取地域pv数据

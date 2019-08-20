@@ -5,6 +5,7 @@ namespace App\Http\Service;
 
 
 use App\Http\Model\RegionAppCategoryModel;
+use App\Http\Model\RegionCategoryModel;
 use App\Http\Model\RegionCodeModel;
 use Illuminate\Support\Facades\DB;
 
@@ -61,28 +62,26 @@ class RegionCodeService {
     /**
      * 获取当前APP用户下的分类城市信息
     */
-    public function getCategoryRegionList($appid = 0, $category_id = 0, $page_size = 0, $words = ''){
-        $where['c.appid'] = $appid;
-        if($words){
-            array_push($where, ['r.region_name', 'like', '%'.$words.'%']);
-        }
-        if($category_id){
-            $where['category_id'] = $category_id;
-        }
-        $columns = ['c.*', 'r.region_name', 'l.name as category_name'];
+    public function getCategoryRegionList($appid = 0){
+        $result = [];
+        $where['appid'] = $appid;
 
-        if($page_size){
-            $result = DB::table('region_app_category as c')
-                ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
-                ->join('region_category as l', 'c.category_id', '=', 'l.id')
-                ->where($where)->select($columns)->paginate($page_size);
-        }else{
-            $result = DB::table('region_app_category as c')
-                ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
-                ->join('region_category as l', 'c.category_id', '=', 'l.id')
-                ->where($where)->get($columns);
-        }
+        $categoryList = RegionCategoryModel::all();
+        foreach ($categoryList as $cate){
+            $where['category_id'] = Q($cate, 'id');
+            $res = [];
+            $res['category_name'] = Q($cate, 'name');
+            $region_code = RegionAppCategoryModel::where($where)->pluck('region_code');
+            $region_list = RegionCodeModel::whereIn('regioncode', $region_code)->pluck('region_name')->toArray();
+            $regions = $region_list ? implode(',', $region_list) : '';
 
+            if(Q($cate, 'id') == 99){    //B类城市
+                $regions = '其他';
+            }
+            $res['region_list'] = $regions;
+
+            $result[] = $res;
+        }
 
         return $result;
     }
@@ -147,7 +146,7 @@ class RegionCodeService {
      * 获取等级分类列表
     */
     public function getRegionCategoryList(){
-        $result = DB::table('region_category')->get()->toArray();
+        $result = RegionCategoryModel::all()->toArray();
 
         return $result ? $result : [];
     }
