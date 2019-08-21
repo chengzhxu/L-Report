@@ -288,14 +288,12 @@ class ReportService {
             foreach ($res as $r){
                 if(Q($r, 'day') == $d){
                     $ie = 1;
-                    $r->ask_num = '暂不支持';
-                    $r->send_num = '暂不支持';
                     array_push($uv_data, $r);
                     break;
                 }
             }
             if($ie == 0){
-                $uv = ['day' => $d, 'num' => 0, 'ask_num' => '暂不支持', 'send_num' => '暂不支持'];
+                $uv = ['day' => $d, 'num' => 0];
                 array_push($uv_data, $uv);
             }
         }
@@ -305,7 +303,7 @@ class ReportService {
             'total_chart' => []
         ];
 
-        $title_list = ['日期','请求量','下发量', '曝光量'];
+        $title_list = ['日期','去重设备数'];
         foreach ($cate_list as $cate){
             array_push($title_list, $cate['name']);
             $chart_list[substr($cate['name'],0, 1) . '_chart'] = [];
