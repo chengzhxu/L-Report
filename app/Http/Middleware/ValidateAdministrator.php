@@ -21,7 +21,7 @@ class ValidateAdministrator
         }
 
         $user = Auth::guard('report')->user();
-        if($user['username'] != 'admin'){
+        if($user['user_type'] != 1){
             return response()->json(['code' => 3003,'message' => '您无权访问该接口']);
         }
 

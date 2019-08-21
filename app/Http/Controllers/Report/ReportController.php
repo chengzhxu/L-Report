@@ -20,11 +20,6 @@ class ReportController extends ReportAbstract {
         $this->_service = app()->make(ReportService::class);
         $this->_regionService = app()->make(RegionCodeService::class);
         $this->_appid = $this->getAppid();
-
-        $user = Auth::guard('report')->user();
-        if(!$this->_appid && $user['username'] == 'admin'){
-            $this->_appid = Q($this->request, 'appid');
-        }
     }
 
     /**

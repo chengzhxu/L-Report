@@ -27,7 +27,7 @@ class UserService {
                     $token = strtoupper(md5(Q($user, 'username').time()));
                     $this->_model->where($where)->update(['api_token' => $token]);
                 }
-                $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid']);
+                $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid', 'user_type']);
                 return $user;
             }else{
                 return false;

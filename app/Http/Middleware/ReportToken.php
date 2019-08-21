@@ -21,7 +21,7 @@ class ReportToken
         }
 
         $user = Auth::guard('report')->user();
-        if((!isset($user['appid']) || !$user['appid']) && $user['username'] != 'admin'){
+        if((!isset($user['appid']) || !$user['appid']) && $user['user_type'] != 1){
             return response()->json(['code' => 3010,'message' => '渠道信息获取失败']);
         }
 

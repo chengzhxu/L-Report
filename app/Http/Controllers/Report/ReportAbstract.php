@@ -27,6 +27,10 @@ class ReportAbstract extends BaseController{
 
     protected function getAppid(){
         $user = $this->guard()->user();
+        if(!Q($user, 'appid') && $user['user_type'] == 1){
+            return Q($this->request, 'appid');
+        }
+
         return isset($user['appid']) ? $user['appid'] : 0;
     }
 
