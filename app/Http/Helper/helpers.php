@@ -3,6 +3,9 @@
 /**
  * @title 给对象赋值 用于排除non-of-object错误
  */
+
+use Illuminate\Support\Facades\DB;
+
 if (! function_exists('Q')) {
     function Q(...$args)
     {
@@ -67,6 +70,25 @@ if(!function_exists('get_code_msg')){
             if($c['code'] == $code){
                 return $c['message'];
             }
+        }
+    }
+}
+
+if(!function_exists('get_user_last_operation')){
+    function get_user_last_operation($appid){
+        if($appid){
+            $c_time = DB::table('user_logs')->where('appid', $appid)->orderBy('ctime', 'desc')->value('ctime');
+            $b_time = $c_time ? strtotime($c_time) : time();
+
+            return time() - $b_time;
+        }
+    }
+}
+
+if(!function_exists('insert_user_log')){
+    function insert_user_log($log = []){
+        if($log){
+            return DB::table('user_logs')->insert($log);
         }
     }
 }

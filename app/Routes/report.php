@@ -19,7 +19,7 @@ use Illuminate\Routing\Router;
 //    // 资源路由
 //});
 
-Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.report'],], function () {
+Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.report', 'user.operation'],], function () {
     Route::any('report/get_region_pv', 'ReportController@getRegionPv');
     Route::any('report/get_region_uv', 'ReportController@getRegionUv');
     Route::any('report/get_realtime_data', 'ReportController@getRealTimeData');
@@ -38,7 +38,7 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.rep
     Route::post('user/logout', 'UserController@logout');
 });
 
-Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['admin.report', 'auth.report'],], function () {
+Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['admin.report', 'auth.report', 'user.operation'],], function () {
     Route::any('report/get_app_list', 'ReportController@getAppList');
 
     Route::any('report/add_category_region', 'ReportController@addCategoryRegion');

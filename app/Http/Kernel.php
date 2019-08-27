@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\Cors;
 use App\Http\Middleware\ReportToken;
 use App\Http\Middleware\ValidateAdministrator;
+use App\Http\Middleware\ValidateUserOperation;
 use Encore\Admin\AdminServiceProvider;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -64,5 +65,6 @@ class Kernel extends HttpKernel
 //        'admin' => AdminServiceProvider::class,
         'auth.report' => ReportToken::class,
         'admin.report' => ValidateAdministrator::class,
+        'user.operation' => ValidateUserOperation::class,
     ];
 }
