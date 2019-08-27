@@ -59,7 +59,7 @@ class ReportService {
             }
         }
 
-        return ['yesterday_pv_count' => $y_count, 'today_pv_count' => $t_count];
+        return ['yesterday_pv_count' => number_format($y_count), 'today_pv_count' => number_format($t_count)];
     }
 
     /**
@@ -221,6 +221,7 @@ class ReportService {
             foreach ($res as $r){
                 if(Q($r, 'day') == $d){
                     $ie = 1;
+                    $r->num = number_format(Q($r, 'num'));
                     $r->ask_num = '暂不支持';
                     $r->send_num = '暂不支持';
                     array_push($pv_data, $r);
@@ -248,15 +249,15 @@ class ReportService {
             if(!is_array($val)){
                 $val = (array)$val;
             }
-            array_push($chart_list['total_chart'], intval(Q($val, 'num')));
+            array_push($chart_list['total_chart'], str_replace(',','',Q($val, 'num')));
             $res = $this->getCategoryHistoryData($val, 'day_group_app_region_pv_stat', 'times', $where, $app_id, Q($val, 'day'), $cate_list, $chart_list);
             $pv_data[$key] = Q($res, 'data');
             $chart_list = Q($res, 'chart');
         }
 
         $result = [
-            'total_pv' => $total_pv,
-            'day_pv' => round($total_pv / $this->day_count, 2),
+            'total_pv' => number_format($total_pv),
+            'day_pv' => number_format(round($total_pv / $this->day_count, 2)),
             'pv_data' => $pv_data,
             'title_list' => $title_list,
             'chart_list' => $chart_list
@@ -283,11 +284,15 @@ class ReportService {
         $res = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$this->start_day, $this->end_day])->groupBy('day')->orderBy('day', 'desc')->get(['day', DB::raw('IFNULL(SUM(uv),0) as num')])->toArray();
         $total_uv = DB::table('day_group_app_region_uv_stat')->where($where)->whereBetween('day', [$this->start_day, $this->end_day])->sum('uv');
         $uv_data = [];
+        $chart_list = [
+            'total_chart' => []
+        ];
         foreach ($date_list as $d){
             $ie = 0;
             foreach ($res as $r){
                 if(Q($r, 'day') == $d){
                     $ie = 1;
+                    $r->num = number_format(intval(Q($r, 'num')));
                     array_push($uv_data, $r);
                     break;
                 }
@@ -299,9 +304,7 @@ class ReportService {
         }
 
         $cate_list = RegionCategoryModel::all();
-        $chart_list = [
-            'total_chart' => []
-        ];
+
 
         $title_list = ['日期','去重设备数'];
         foreach ($cate_list as $cate){
@@ -313,15 +316,15 @@ class ReportService {
             if(!is_array($val)){
                 $val = (array)$val;
             }
-            array_push($chart_list['total_chart'], intval(Q($val, 'num')));
+            array_push($chart_list['total_chart'], str_replace(',','',Q($val, 'num')));
             $res = $this->getCategoryHistoryData($val, 'day_group_app_region_uv_stat', 'uv', $where, $app_id, Q($val, 'day'), $cate_list, $chart_list);
             $uv_data[$key] = Q($res, 'data');
             $chart_list = Q($res, 'chart');
         }
 
         $result = [
-            'total_uv' => $total_uv,
-            'day_uv' => round($total_uv / $this->day_count, 2),
+            'total_uv' => number_format($total_uv),
+            'day_uv' => number_format(round($total_uv / $this->day_count, 2)),
             'uv_data' => $uv_data,
             'title_list' => $title_list,
             'chart_list' => $chart_list
@@ -396,7 +399,7 @@ class ReportService {
             $s_chart = $c . '_chart';
             array_push($chart_list[$s_chart], intval($num));
 
-            $data[$key] = intval($num);
+            $data[$key] = number_format($num);
         }
 
         return ['data' => $data, 'chart' => $chart_list];
