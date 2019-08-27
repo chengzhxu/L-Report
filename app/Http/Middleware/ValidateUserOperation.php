@@ -18,7 +18,7 @@ class ValidateUserOperation
     {
         $user = Auth::guard('report')->user();
         if(Q($user, 'appid')){
-            $diff_time = get_user_last_operation($user['appid']);
+            $diff_time = get_user_last_operation_diff_time($user['appid']);
             if($diff_time > 1800){
                 return response()->json(['code' => 3000,'message' => '长时间未操作，请重新登录']);
             }

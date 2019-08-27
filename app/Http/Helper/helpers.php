@@ -74,8 +74,8 @@ if(!function_exists('get_code_msg')){
     }
 }
 
-if(!function_exists('get_user_last_operation')){
-    function get_user_last_operation($appid){
+if(!function_exists('get_user_last_operation_diff_time')){
+    function get_user_last_operation_diff_time($appid){
         if($appid){
             $c_time = DB::table('user_logs')->where('appid', $appid)->orderBy('ctime', 'desc')->value('ctime');
             $b_time = $c_time ? strtotime($c_time) : time();
