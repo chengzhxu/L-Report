@@ -44,7 +44,7 @@ class ReportService {
             $t_day = substr($t_day, 2);
             $y_day = substr($y_day, 2);
             $sql = 'select dw_date, sum(num) as num from stat_app_ad where appid = ' .$app_id. ' and dw_date >= ' . $y_day . ' group by dw_date';
-            $t_res = DB::connection('online_v2_cpanel')->select($sql);
+            $t_res = DB::connection('v2_cpanel')->select($sql);
             if(!empty($t_res)){
                 foreach ($t_res as $key => $val){
                     if(!is_array($val)){
@@ -67,7 +67,7 @@ class ReportService {
     */
     public function getAppList(){
         $sql = 'select appid, title from cpanel_app ';
-        $t_res = DB::connection('online_v2_cpanel')->select($sql);
+        $t_res = DB::connection('v2_cpanel')->select($sql);
 
         return $t_res ? $t_res : [];
     }

@@ -28,6 +28,15 @@ class UserService {
                     $this->_model->where($where)->update(['api_token' => $token]);
                 }
                 $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid', 'user_type']);
+
+                $log = [
+                    'appid' => Q($user, 'appid'),
+                    'route' => \Request::getRequestUri(),
+                    'param' => json_encode(\Request::all()),
+                    'ctime' => date('Y-m-d H:i:s', time())
+                ];
+                insert_user_log($log);
+
                 return $user;
             }else{
                 return false;

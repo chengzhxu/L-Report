@@ -43,7 +43,7 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '172.31.0.227'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'in_ssp'),
+            'database' => env('DB_DATABASE', 'bas_stat'),
             'username' => env('DB_USERNAME', 'dev'),
             'password' => env('DB_PASSWORD', '123123'),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -54,7 +54,7 @@ return [
             'engine' => null,
         ],
 
-        'online_v2_cpanel' => [
+        'v2_cpanel' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST_CPANEL', '172.31.0.227'),
             'port' => env('DB_PORT_CPANEL', '3306'),
