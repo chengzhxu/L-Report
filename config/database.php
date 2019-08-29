@@ -69,6 +69,21 @@ return [
             'engine' => null,
         ],
 
+        'in_ssp' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST_SSP', '172.31.0.227'),
+            'port' => env('DB_PORT_SSP', '3306'),
+            'database' => env('DB_DATABASE_SSP', 'in_ssp'),
+            'username' => env('DB_USERNAME_SSP', 'dev'),
+            'password' => env('DB_PASSWORD_SSP', '123123'),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),

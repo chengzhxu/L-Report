@@ -25,7 +25,7 @@ class ValidateUserOperation
         }
 
         $log = [
-            'appid' => Q($user, 'appid'),
+            'appid' => Q($user, 'appid') ? Q($user, 'appid') : 0,
             'route' => $request->getRequestUri(),
             'param' => json_encode($request->all()),
             'ctime' => date('Y-m-d H:i:s', time())

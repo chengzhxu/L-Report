@@ -7,13 +7,16 @@ namespace App\Http\Service;
 use App\Http\Model\RegionAppCategoryModel;
 use App\Http\Model\RegionCategoryModel;
 use App\Http\Model\RegionCodeModel;
+use App\Http\Model\UserModel;
 use Illuminate\Support\Facades\DB;
 
 class RegionCodeService {
     private $_model;
+    private $_regionApp;
 
     public function __construct(){
         $this->_model = app()->make(RegionCodeModel::class);
+        $this->_regionApp = app()->make(RegionAppCategoryModel::class);
     }
 
     /**
@@ -98,7 +101,7 @@ class RegionCodeService {
                 'appid' => $appid,
                 'region_code' => $region_code
             ];
-            return DB::table('region_app_category')->where($where)->first();
+            return RegionAppCategoryModel::where($where)->first();
         }
     }
 
@@ -115,11 +118,16 @@ class RegionCodeService {
      * 获取城市等级信息
      */
     public function getCategoryRegionInfo($id = 0){
-        $columns = ['c.*', 'r.region_name', 'l.name as category_name'];
-        return DB::table('region_app_category as c')
-            ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
-            ->join('region_category as l', 'c.category_id', '=', 'l.id')
-            ->where('c.id', $id)->first($columns);
+        $where = ['id' => $id];
+//        $columns = ['c.*', 'r.region_name', 'l.name as category_name'];
+//        $result = DB::connection('in_ssp')->table('region_app_category as c')
+//            ->join('t_region_code as r', 'c.region_code', '=', 'r.regioncode')
+//            ->join('region_category as l', 'c.category_id', '=', 'l.id')
+//            ->where('c.id', $id)->first($columns);
+
+        $result = RegionAppCategoryModel::where($where)->with(['region', 'category'])->get();
+
+        return $result;
     }
 
     /**
@@ -164,8 +172,8 @@ class RegionCodeService {
             if($category_id){
                 $where['category_id'] = $category_id;
             }
-            $result = DB::table('region_app_category')->join('t_region_code', 'region_app_category.region_code', '=', 't_region_code.regioncode')
-                ->where($where)->get(['region_app_category.*', 't_region_code.region_name'])->toArray();
+
+            $result = RegionAppCategoryModel::where($where)->with(['region'])->get();
         }
 
         return $result;

@@ -3,10 +3,10 @@
 
 namespace App\Http\Model;
 
-
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class RegionCategoryModel extends Model {
+class UserLogsModel extends Authenticatable {
     /**
      * 与模型关联的数据表
      *
@@ -14,7 +14,7 @@ class RegionCategoryModel extends Model {
      */
     protected $connection = 'in_ssp';
 
-    protected $table = 'region_category';
+    protected $table = 'user_logs';
 
     /**
      * 该模型是否被自动维护时间戳
@@ -24,7 +24,9 @@ class RegionCategoryModel extends Model {
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
-        'name',
+        'appid',
+        'route',
+        'param',
+        'ctime',
     ];
 }

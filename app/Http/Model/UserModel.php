@@ -12,6 +12,8 @@ class UserModel extends Authenticatable {
      *
      * @var string
      */
+    protected $connection = 'in_ssp';
+
     protected $table = 'admin_user';
 
     /**

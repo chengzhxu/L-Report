@@ -30,7 +30,7 @@ class UserService {
                 $user = $this->_model->where($where)->first(['username', 'fullname', 'api_token', 'appid', 'user_type']);
 
                 $log = [
-                    'appid' => Q($user, 'appid'),
+                    'appid' => Q($user, 'appid') ? Q($user, 'appid') : 0,
                     'route' => \Request::getRequestUri(),
                     'param' => json_encode(\Request::all()),
                     'ctime' => date('Y-m-d H:i:s', time())
@@ -49,9 +49,9 @@ class UserService {
 
     public function logOut($token){
         if($token){
-            $user = DB::table('admin_user')->where(['api_token' => $token])->first();
+            $user = $this->_model->where(['api_token' => $token])->first();
             if($user){
-                return DB::table('admin_user')->where(['api_token' => $token])->update(['api_token' => '']);
+                return $this->_model->where(['api_token' => $token])->update(['api_token' => '']);
             }else{
                 return false;
             }

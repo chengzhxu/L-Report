@@ -77,7 +77,7 @@ if(!function_exists('get_code_msg')){
 if(!function_exists('get_user_last_operation_diff_time')){
     function get_user_last_operation_diff_time($appid){
         if($appid){
-            $c_time = DB::table('user_logs')->where('appid', $appid)->orderBy('ctime', 'desc')->value('ctime');
+            $c_time = app()->make(\App\Http\Model\UserLogsModel::class)->where('appid', $appid)->orderBy('ctime', 'desc')->value('ctime');
             $b_time = $c_time ? strtotime($c_time) : time();
 
             return time() - $b_time;
@@ -88,7 +88,7 @@ if(!function_exists('get_user_last_operation_diff_time')){
 if(!function_exists('insert_user_log')){
     function insert_user_log($log = []){
         if($log){
-            return DB::table('user_logs')->insert($log);
+            return app()->make(\App\Http\Model\UserLogsModel::class)->insert($log);
         }
     }
 }

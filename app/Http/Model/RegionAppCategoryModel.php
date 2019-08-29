@@ -12,6 +12,8 @@ class RegionAppCategoryModel extends Model {
      *
      * @var string
      */
+    protected $connection = 'in_ssp';
+
     protected $table = 'region_app_category';
 
     /**
@@ -38,6 +40,6 @@ class RegionAppCategoryModel extends Model {
 
     public function category()
     {
-        return $this->belongsTo(RegionCategoryModel::class, 'category_id', 'id  ');
+        return $this->belongsTo(RegionCategoryModel::class, 'category_id', 'id');
     }
 }
