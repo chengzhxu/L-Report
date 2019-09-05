@@ -19,7 +19,7 @@ class ReportController extends ReportAbstract {
 
         $this->_service = app()->make(ReportService::class);
         $this->_regionService = app()->make(RegionCodeService::class);
-        $this->_appid = $this->getAppid();
+        $this->_appid = $this->getAppid() ? $this->getAppid() : 0;
     }
 
     /**
