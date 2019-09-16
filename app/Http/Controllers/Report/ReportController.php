@@ -35,7 +35,8 @@ class ReportController extends ReportAbstract {
      * 获取渠道列表信息
     */
     public function getAppList(){
-        $result = $this->_service->getAppList();
+        $words = Q($this->request, 'words');
+        $result = $this->_service->getAppList($words);
 
         return $this->toJson(200, $result);
     }

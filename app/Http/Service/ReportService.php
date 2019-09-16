@@ -65,8 +65,11 @@ class ReportService {
     /**
      * 获取渠道列表
     */
-    public function getAppList(){
-        $sql = 'select appid, title from cpanel_app ';
+    public function getAppList($words = ''){
+        $sql = "select appid, title from cpanel_app ";
+        if($words){
+            $sql .= " where title like '%" . $words . "%'";
+        }
         $t_res = DB::connection('v2_cpanel')->select($sql);
 
         return $t_res ? $t_res : [];
