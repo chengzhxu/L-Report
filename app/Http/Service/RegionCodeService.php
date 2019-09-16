@@ -78,7 +78,6 @@ class RegionCodeService {
             $region_code = array_column($cate_region, 'region_code');
             $region_list = RegionCodeModel::whereIn('regioncode', $region_code)->pluck('region_name')->toArray();
             $regions = $region_list ? implode(',', $region_list) : '';
-
             if(Q($cate, 'id') == 99){    //B类城市
                 $regions = '其他';
             }
