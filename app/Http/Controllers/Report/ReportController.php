@@ -215,8 +215,9 @@ class ReportController extends ReportAbstract {
     public function addCategoryRegion(){
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
+        $appid = $this->_appid ? $this->_appid : Q($this->request, 'appid');
 
-        $res_code = $this->validateCategory($this->request);
+        $res_code = $this->validateCategory($this->request, $appid);
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
@@ -262,10 +263,11 @@ class ReportController extends ReportAbstract {
         $region_id = Q($this->request, 'region_id');
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
+        $appid = $this->_appid ? $this->_appid : Q($this->request, 'appid');
         if(!$region_id) {
             return $this->toJson(5004, []);
         }
-        $res_code = $this->validateCategory($this->request);
+        $res_code = $this->validateCategory($this->request, $appid);
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
@@ -311,14 +313,14 @@ class ReportController extends ReportAbstract {
     /**
      * 验证等级城市信息新增
     */
-    private function validateCategory($data = []){
+    private function validateCategory($data = [], $appid){
         if(!Q($data, 'category_id')){
             return 5001;
         }
         if(!Q($data, 'region_code')){
             return 5002;
         }
-        if(!$this->_appid){
+        if(!$appid){
             return 5011;
         }
         if(!$this->_regionService->getRegionByCode(Q($data, 'region_code'))){
