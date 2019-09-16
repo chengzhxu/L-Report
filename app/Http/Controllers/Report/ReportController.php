@@ -298,14 +298,14 @@ class ReportController extends ReportAbstract {
     */
     public function deleteCategoryRegionById(){
         $region_id = Q($this->request, 'region_id');
-        $app_id = $this->_appid ?  $this->_appid : Q($this->request, 'app_id');
+//        $app_id = $this->_appid ?  $this->_appid : Q($this->request, 'app_id');
         $region = $this->_regionService->getCategoryRegionInfo($region_id);
         if(!$region){
             return $this->toJson(5005, []);
         }
-        if(Q($region, 'appid') != $app_id){
-            return $this->toJson(5009, []);
-        }
+//        if(Q($region, 'appid') != $app_id){
+//            return $this->toJson(5009, []);
+//        }
         if($this->_regionService->delCategoryRegionInfo($region_id)){
             return $this->toJson(200, []);
         }else{
