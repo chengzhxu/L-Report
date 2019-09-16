@@ -28,11 +28,6 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.rep
     Route::any('report/get_history_pv', 'ReportController@getHistoryPv');
     Route::any('report/get_history_uv', 'ReportController@getHistoryUv');
 
-    Route::any('report/get_region_list', 'ReportController@getRegionList');
-    Route::any('report/get_category_region_list', 'ReportController@getCategoryRegionList');
-    Route::any('report/get_region_category_list', 'ReportController@getRegionCategoryList');
-    Route::any('report/get_region_by_category', 'ReportController@getRegionByCategory');
-
     Route::any('report/test', 'ReportController@test');
     Route::any('report/get_cpanel_group', 'ReportController@getCpanelGroup');
     Route::post('user/logout', 'UserController@logout');
@@ -40,13 +35,22 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.rep
 
 Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['admin.report', 'auth.report', 'user.operation'],], function () {
     Route::any('report/get_app_list', 'ReportController@getAppList');
-
-    Route::any('report/add_category_region', 'ReportController@addCategoryRegion');
-    Route::any('report/get_category_region_info', 'ReportController@getCategoryRegionById');
-    Route::any('report/update_category_region_info', 'ReportController@updateCategoryRegionById');
-    Route::any('report/delete_category_region_info', 'ReportController@deleteCategoryRegionById');
 });
+
 
 Route::group(['prefix' => '','namespace' => 'Report'], function () {
     Route::post('user/login', 'UserController@login');
+});
+
+Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => [],], function () {
+    Route::any('report/get_category_region_list', 'ReportController@getCategoryRegionList');
+    Route::any('report/get_region_category_list', 'ReportController@getRegionCategoryList');
+    Route::any('report/add_category_region', 'ReportController@addCategoryRegion');
+    Route::any('report/get_region_app_list', 'ReportController@getAppList');    //勿删
+    Route::any('report/get_category_region_info', 'ReportController@getCategoryRegionById');
+    Route::any('report/update_category_region_info', 'ReportController@updateCategoryRegionById');
+    Route::any('report/delete_category_region_info', 'ReportController@deleteCategoryRegionById');
+
+    Route::any('report/get_region_list', 'ReportController@getRegionList');
+    Route::any('report/get_region_by_category', 'ReportController@getRegionByCategory');
 });

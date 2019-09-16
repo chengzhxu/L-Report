@@ -35,7 +35,8 @@ class ReportController extends ReportAbstract {
      * 获取渠道列表信息
     */
     public function getAppList(){
-        $result = $this->_service->getAppList();
+        $words = Q($this->request, 'words');
+        $result = $this->_service->getAppList($words);
 
         return $this->toJson(200, $result);
     }
@@ -204,7 +205,8 @@ class ReportController extends ReportAbstract {
      * 获取当前APP的城市信息
     */
     public function getCategoryRegionList(){
-        $result = $this->_regionService->getCategoryRegionList($this->_appid);
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
+        $result = $this->_regionService->getCategoryRegionList($app_id);
 
         return $this->toJson(200, $result);
     }
@@ -215,19 +217,20 @@ class ReportController extends ReportAbstract {
     public function addCategoryRegion(){
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
 
-        $res_code = $this->validateCategory($this->request);
+        $res_code = $this->validateCategory($this->request, $app_id);
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
-        $category = $this->_regionService->getCategoryByAppRegion($this->_appid, $region_code);
+        $category = $this->_regionService->getCategoryByAppRegion($app_id, $region_code);
         if($category){
             return $this->toJson(5007, $category);
         }
 
         $category = [
             'region_code' => $region_code,
-            'appid' => $this->_appid,
+            'appid' => $app_id,
             'category_id' => $category_id
         ];
         $res = $this->_regionService->addCategoryRegion($category);
@@ -262,16 +265,17 @@ class ReportController extends ReportAbstract {
         $region_id = Q($this->request, 'region_id');
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
         if(!$region_id) {
             return $this->toJson(5004, []);
         }
-        $res_code = $this->validateCategory($this->request);
+        $res_code = $this->validateCategory($this->request, $app_id);
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
         $category = $this->_regionService->getCategoryRegionInfo($region_id);
         if($category){
-            $appRegion = $this->_regionService->getCategoryByAppRegion($this->_appid, $region_code);
+            $appRegion = $this->_regionService->getCategoryByAppRegion($app_id, $region_code);
             if($appRegion && Q($appRegion, 'id') != $region_id){
                 return $this->toJson(5007, $appRegion);
             }
@@ -294,13 +298,14 @@ class ReportController extends ReportAbstract {
     */
     public function deleteCategoryRegionById(){
         $region_id = Q($this->request, 'region_id');
+//        $app_id = $this->_appid ?  $this->_appid : Q($this->request, 'app_id');
         $region = $this->_regionService->getCategoryRegionInfo($region_id);
         if(!$region){
             return $this->toJson(5005, []);
         }
-        if(Q($region, 'appid') != $this->_appid){
-            return $this->toJson(5009, []);
-        }
+//        if(Q($region, 'appid') != $app_id){
+//            return $this->toJson(5009, []);
+//        }
         if($this->_regionService->delCategoryRegionInfo($region_id)){
             return $this->toJson(200, []);
         }else{
@@ -311,14 +316,14 @@ class ReportController extends ReportAbstract {
     /**
      * 验证等级城市信息新增
     */
-    private function validateCategory($data = []){
+    private function validateCategory($data = [], $appid){
         if(!Q($data, 'category_id')){
             return 5001;
         }
         if(!Q($data, 'region_code')){
             return 5002;
         }
-        if(!$this->_appid){
+        if(!$appid){
             return 5011;
         }
         if(!$this->_regionService->getRegionByCode(Q($data, 'region_code'))){
@@ -343,7 +348,8 @@ class ReportController extends ReportAbstract {
     */
     public function getRegionByCategory(){
         $category_id = Q($this->request, 'category_id');
-        $result = $this->_regionService->getRegionByCategory($this->_appid, $category_id);
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
+        $result = $this->_regionService->getRegionByCategory($app_id, $category_id);
 
         return $this->toJson(200, $result);
     }
