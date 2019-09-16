@@ -58,7 +58,7 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_HOST_CPANEL', '172.31.0.227'),
             'port' => env('DB_PORT_CPANEL', '3306'),
-            'database' => env('DB_DATABASE_CPANEL', 'online_v2_cpanel'),
+            'database' => env('DB_DATABASE_CPANEL', 'v2_cpanel'),
             'username' => env('DB_USERNAME_CPANEL', 'dev'),
             'password' => env('DB_PASSWORD_CPANEL', '123123'),
             'unix_socket' => env('DB_SOCKET', ''),

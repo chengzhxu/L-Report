@@ -47,7 +47,6 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['admin.re
     Route::any('report/delete_category_region_info', 'ReportController@deleteCategoryRegionById');
 });
 
-
 Route::group(['prefix' => '','namespace' => 'Report'], function () {
     Route::post('user/login', 'UserController@login');
 });
