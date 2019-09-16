@@ -221,7 +221,7 @@ class ReportController extends ReportAbstract {
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
-        $category = $this->_regionService->getCategoryByAppRegion($this->_appid, $region_code);
+        $category = $this->_regionService->getCategoryByAppRegion($appid, $region_code);
         if($category){
             return $this->toJson(5007, $category);
         }
