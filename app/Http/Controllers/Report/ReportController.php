@@ -347,7 +347,8 @@ class ReportController extends ReportAbstract {
     */
     public function getRegionByCategory(){
         $category_id = Q($this->request, 'category_id');
-        $result = $this->_regionService->getRegionByCategory($this->_appid, $category_id);
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
+        $result = $this->_regionService->getRegionByCategory($app_id, $category_id);
 
         return $this->toJson(200, $result);
     }

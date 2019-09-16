@@ -28,10 +28,6 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.rep
     Route::any('report/get_history_pv', 'ReportController@getHistoryPv');
     Route::any('report/get_history_uv', 'ReportController@getHistoryUv');
 
-    Route::any('report/get_region_list', 'ReportController@getRegionList');
-
-    Route::any('report/get_region_by_category', 'ReportController@getRegionByCategory');
-
     Route::any('report/test', 'ReportController@test');
     Route::any('report/get_cpanel_group', 'ReportController@getCpanelGroup');
     Route::post('user/logout', 'UserController@logout');
@@ -53,4 +49,7 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => [],], func
     Route::any('report/get_category_region_info', 'ReportController@getCategoryRegionById');
     Route::any('report/update_category_region_info', 'ReportController@updateCategoryRegionById');
     Route::any('report/delete_category_region_info', 'ReportController@deleteCategoryRegionById');
+
+    Route::any('report/get_region_list', 'ReportController@getRegionList');
+    Route::any('report/get_region_by_category', 'ReportController@getRegionByCategory');
 });
