@@ -75,6 +75,9 @@ class RegionCodeService {
             $res = [];
             $res['category_name'] = Q($cate, 'name');
             $cate_region = RegionAppCategoryModel::where($where)->with(['region'])->get(['id', 'region_code'])->toArray();
+            array_walk($cate_region, function (&$row) {
+                $row['region_name'] = Q($row, 'region', 'region_name');
+            });
             $region_code = array_column($cate_region, 'region_code');
             $region_list = RegionCodeModel::whereIn('regioncode', $region_code)->pluck('region_name')->toArray();
             $regions = $region_list ? implode(',', $region_list) : '';
