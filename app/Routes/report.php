@@ -46,6 +46,7 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => [],], func
     Route::any('report/get_category_region_list', 'ReportController@getCategoryRegionList');
     Route::any('report/get_region_category_list', 'ReportController@getRegionCategoryList');
     Route::any('report/add_category_region', 'ReportController@addCategoryRegion');
+    Route::any('report/get_region_app_list', 'ReportController@getAppList');    //勿删
     Route::any('report/get_category_region_info', 'ReportController@getCategoryRegionById');
     Route::any('report/update_category_region_info', 'ReportController@updateCategoryRegionById');
     Route::any('report/delete_category_region_info', 'ReportController@deleteCategoryRegionById');
