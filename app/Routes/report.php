@@ -46,6 +46,7 @@ Route::group(['prefix' => '','namespace' => 'Report'], function () {
     Route::post('user/login', 'UserController@login');
 });
 
+
 Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => [],], function () {
     Route::any('report/get_category_region_list', 'ReportController@getCategoryRegionList');
     Route::any('report/get_region_category_list', 'ReportController@getRegionCategoryList');
