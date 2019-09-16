@@ -215,20 +215,20 @@ class ReportController extends ReportAbstract {
     public function addCategoryRegion(){
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
-        $appid = $this->_appid ? $this->_appid : Q($this->request, 'appid');
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
 
-        $res_code = $this->validateCategory($this->request, $appid);
+        $res_code = $this->validateCategory($this->request, $app_id);
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
-        $category = $this->_regionService->getCategoryByAppRegion($appid, $region_code);
+        $category = $this->_regionService->getCategoryByAppRegion($app_id, $region_code);
         if($category){
             return $this->toJson(5007, $category);
         }
 
         $category = [
             'region_code' => $region_code,
-            'appid' => $appid,
+            'appid' => $app_id,
             'category_id' => $category_id
         ];
         $res = $this->_regionService->addCategoryRegion($category);
@@ -263,17 +263,17 @@ class ReportController extends ReportAbstract {
         $region_id = Q($this->request, 'region_id');
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
-        $appid = $this->_appid ? $this->_appid : Q($this->request, 'appid');
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
         if(!$region_id) {
             return $this->toJson(5004, []);
         }
-        $res_code = $this->validateCategory($this->request, $appid);
+        $res_code = $this->validateCategory($this->request, $app_id);
         if($res_code !== true){
             return $this->toJson($res_code, []);
         }
         $category = $this->_regionService->getCategoryRegionInfo($region_id);
         if($category){
-            $appRegion = $this->_regionService->getCategoryByAppRegion($appid, $region_code);
+            $appRegion = $this->_regionService->getCategoryByAppRegion($app_id, $region_code);
             if($appRegion && Q($appRegion, 'id') != $region_id){
                 return $this->toJson(5007, $appRegion);
             }
@@ -296,11 +296,12 @@ class ReportController extends ReportAbstract {
     */
     public function deleteCategoryRegionById(){
         $region_id = Q($this->request, 'region_id');
+        $app_id = $this->_appid ?  $this->_appid : Q($this->request, 'app_id');
         $region = $this->_regionService->getCategoryRegionInfo($region_id);
         if(!$region){
             return $this->toJson(5005, []);
         }
-        if(Q($region, 'appid') != $this->_appid){
+        if(Q($region, 'appid') != $app_id){
             return $this->toJson(5009, []);
         }
         if($this->_regionService->delCategoryRegionInfo($region_id)){
