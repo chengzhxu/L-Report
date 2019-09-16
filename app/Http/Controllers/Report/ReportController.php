@@ -228,7 +228,7 @@ class ReportController extends ReportAbstract {
 
         $category = [
             'region_code' => $region_code,
-            'appid' => $this->_appid,
+            'appid' => $appid,
             'category_id' => $category_id
         ];
         $res = $this->_regionService->addCategoryRegion($category);
@@ -273,7 +273,7 @@ class ReportController extends ReportAbstract {
         }
         $category = $this->_regionService->getCategoryRegionInfo($region_id);
         if($category){
-            $appRegion = $this->_regionService->getCategoryByAppRegion($this->_appid, $region_code);
+            $appRegion = $this->_regionService->getCategoryByAppRegion($appid, $region_code);
             if($appRegion && Q($appRegion, 'id') != $region_id){
                 return $this->toJson(5007, $appRegion);
             }
