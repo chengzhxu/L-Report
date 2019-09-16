@@ -30,7 +30,6 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => ['auth.rep
 
     Route::any('report/get_region_list', 'ReportController@getRegionList');
 
-    Route::any('report/get_region_category_list', 'ReportController@getRegionCategoryList');
     Route::any('report/get_region_by_category', 'ReportController@getRegionByCategory');
 
     Route::any('report/test', 'ReportController@test');
@@ -49,6 +48,7 @@ Route::group(['prefix' => '','namespace' => 'Report'], function () {
 
 Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => [],], function () {
     Route::any('report/get_category_region_list', 'ReportController@getCategoryRegionList');
+    Route::any('report/get_region_category_list', 'ReportController@getRegionCategoryList');
     Route::any('report/add_category_region', 'ReportController@addCategoryRegion');
     Route::any('report/get_category_region_info', 'ReportController@getCategoryRegionById');
     Route::any('report/update_category_region_info', 'ReportController@updateCategoryRegionById');
