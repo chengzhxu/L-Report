@@ -204,7 +204,8 @@ class ReportController extends ReportAbstract {
      * 获取当前APP的城市信息
     */
     public function getCategoryRegionList(){
-        $result = $this->_regionService->getCategoryRegionList($this->_appid);
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
+        $result = $this->_regionService->getCategoryRegionList($app_id);
 
         return $this->toJson(200, $result);
     }
