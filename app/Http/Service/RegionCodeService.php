@@ -74,7 +74,8 @@ class RegionCodeService {
             $where['category_id'] = Q($cate, 'id');
             $res = [];
             $res['category_name'] = Q($cate, 'name');
-            $region_code = RegionAppCategoryModel::where($where)->pluck('region_code');
+            $cate_region = RegionAppCategoryModel::where($where)->with(['region'])->get(['id', 'region_code'])->toArray();
+            $region_code = array_column($cate_region, 'region_code');
             $region_list = RegionCodeModel::whereIn('regioncode', $region_code)->pluck('region_name')->toArray();
             $regions = $region_list ? implode(',', $region_list) : '';
 
@@ -82,6 +83,7 @@ class RegionCodeService {
                 $regions = '其他';
             }
             $res['region_list'] = $regions ? $regions : '无';
+            $res['category_region'] = $cate_region ? $cate_region : [];
 
             $result[] = $res;
         }
