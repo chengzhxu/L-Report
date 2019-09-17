@@ -7,7 +7,6 @@ namespace App\Http\Service;
 use App\Http\Model\RegionAppCategoryModel;
 use App\Http\Model\RegionCategoryModel;
 use App\Http\Model\RegionCodeModel;
-use App\Http\Model\UserModel;
 use Illuminate\Support\Facades\DB;
 
 class RegionCodeService {

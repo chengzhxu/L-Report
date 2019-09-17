@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Report;
 use App\Http\Service\RegionCodeService;
 use App\Http\Service\ReportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ReportController extends ReportAbstract {
 
