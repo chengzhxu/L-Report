@@ -455,13 +455,6 @@ class ReportService {
     /**
      *
     */
-    public function getAppRegionNuv(){
-
-    }
-
-    /**
-     *
-    */
     private function transeDateList($start_day = '', $end_day = ''){
         $date_list = [];
         if($start_day && $end_day){
