@@ -12,7 +12,7 @@ class AppRegionNuvStatModel extends Model {
      *
      * @var string
      */
-    protected $table = 'app_region_nuv_stat';
+    protected $table = 'app_region_nuv_stat';    //已废弃
 
     /**
      * 该模型是否被自动维护时间戳
