@@ -28,6 +28,7 @@ class RegionAppCategoryModel extends Model {
         'region_code',
         'appid',
         'category_id',
+        'price',
         'created_at',
         'updated_at',
     ];

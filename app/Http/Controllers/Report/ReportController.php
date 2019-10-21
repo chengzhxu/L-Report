@@ -216,6 +216,7 @@ class ReportController extends ReportAbstract {
     public function addCategoryRegion(){
         $category_id = Q($this->request, 'category_id');
         $region_code = Q($this->request, 'region_code');
+        $price = Q($this->request, 'price');
         $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
 
         $res_code = $this->validateCategory($this->request, $app_id);
@@ -230,7 +231,8 @@ class ReportController extends ReportAbstract {
         $category = [
             'region_code' => $region_code,
             'appid' => $app_id,
-            'category_id' => $category_id
+            'category_id' => $category_id,
+            'price' => $price
         ];
         $res = $this->_regionService->addCategoryRegion($category);
         if($res){
