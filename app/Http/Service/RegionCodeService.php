@@ -72,6 +72,7 @@ class RegionCodeService {
         foreach ($categoryList as $cate){
             $where['category_id'] = Q($cate, 'id');
             $res = [];
+            $res['category_id'] = Q($cate, 'id');
             $res['category_name'] = Q($cate, 'name');
             $cate_region = RegionAppCategoryModel::where($where)->with(['region'])->get(['id', 'region_code', 'price'])->toArray();
             array_walk($cate_region, function (&$row) {
