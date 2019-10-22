@@ -363,7 +363,7 @@ class ReportController extends ReportAbstract {
         $price = Q($this->request, 'price');
         $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
 
-        if(!$price || !is_numeric($price) || $price < 0){
+        if(($price !== 0) && (!is_numeric($price) || $price < 0)){
             return $this->toJson(5012, []);
         }
 
@@ -417,7 +417,7 @@ class ReportController extends ReportAbstract {
         if(!$price_id) {
             return $this->toJson(5015, []);
         }
-        if(!$price || !is_numeric($price) || $price < 0){
+        if(($price !== 0) && (!is_numeric($price) || $price < 0)){
             return $this->toJson(5012, []);
         }
         $category_price = $this->_regionService->getCategoryPriceInfo($price_id);
