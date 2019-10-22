@@ -93,7 +93,7 @@ class RegionCodeService {
             $result[] = $res;
         }
 
-        $this->getCategoryRegionPrice($result, $appid);
+        $result = $this->getCategoryRegionPrice($result, $appid);
 
         return $result;
     }
@@ -102,7 +102,7 @@ class RegionCodeService {
      * 获取当前渠道下的分类城市价格
     */
     private function getCategoryRegionPrice($categoryList = [], $appid = 0){
-        if(Schema::hasTable('app_category_price')){     //判断价格表是否存在
+        if(Schema::connection('in_ssp')->hasTable('app_category_price')){     //判断价格表是否存在
             if(!$categoryList){
                 $categoryList = RegionCategoryModel::all();
             }
