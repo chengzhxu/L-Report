@@ -4,10 +4,13 @@
 namespace App\Http\Service;
 
 
+use App\Http\Model\AppCategoryPriceModel;
 use App\Http\Model\RegionAppCategoryModel;
 use App\Http\Model\RegionCategoryModel;
 use App\Http\Model\RegionCodeModel;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RegionCodeService {
     private $_model;
@@ -90,7 +93,92 @@ class RegionCodeService {
             $result[] = $res;
         }
 
+        $this->getCategoryRegionPrice($result, $appid);
+
         return $result;
+    }
+
+    /**
+     * 获取当前渠道下的分类城市价格
+    */
+    private function getCategoryRegionPrice($categoryList = [], $appid = 0){
+        if(Schema::hasTable('app_category_price')){     //判断价格表是否存在
+            if(!$categoryList){
+                $categoryList = RegionCategoryModel::all();
+            }
+            array_walk($categoryList, function (&$cate) use ($appid) {
+                $where = [
+                    'category_id' => Q($cate, 'category_id') ? $cate['category_id'] : 0,
+                    'appid' => $appid
+                ];
+                $price = AppCategoryPriceModel::where($where)->value('price');
+                $cate['price'] = $price ? $price : 0;
+            });
+        }
+
+        return $categoryList;
+    }
+
+    /**
+     * 新增渠道城市等级价格
+    */
+    public function addCategoryPrice($cate_price = []){
+        if($cate_price){
+            $entity = new AppCategoryPriceModel($cate_price);
+            return $entity->save($cate_price) ? $this->getCategoryPriceInfo($entity->id) : [];
+        }
+
+        return false;
+    }
+
+    /**
+     * 更新城市等级信息
+     */
+    public function updateCategoryPriceInfo($price_id = 0, $price = []){
+        if($price_id && $price){
+            unset($price['id']);
+
+            return AppCategoryPriceModel::where('id', $price_id)->update($price);
+        }
+
+        return false;
+    }
+
+    /**
+     * 删除城市等级价格信息
+     */
+    public function delCategoryPriceInfo($price_id = 0){
+        if($price_id){
+            return AppCategoryPriceModel::where('id', $price_id)->delete();
+        }
+
+        return false;
+    }
+
+    /**
+     * 获取城市等级价格信息
+     */
+    public function getCategoryPriceInfo($id = 0){
+        $where = ['id' => $id];
+        $result = AppCategoryPriceModel::where($where)->with(['category'])->get();
+
+        return $result;
+    }
+
+    /**
+     * 判断分类城市价格信息是否存在
+    */
+    public function getPriceByCategory($appid = 0, $cate_id = 0){
+        if($appid && $cate_id){
+            $where = [
+                'appid' => $appid,
+                'category_id' => $cate_id
+            ];
+
+            return AppCategoryPriceModel::where($where)->first();
+        }
+
+        return [];
     }
 
     /**

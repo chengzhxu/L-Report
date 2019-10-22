@@ -355,4 +355,104 @@ class ReportController extends ReportAbstract {
         return $this->toJson(200, $result);
     }
 
+    /**
+     * 新增城市分类价格信息
+    */
+    public function addCategoryPrice(){
+        $category_id = Q($this->request, 'category_id');
+        $price = Q($this->request, 'price');
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
+
+        if(!$price || !is_numeric($price) || $price < 0 || $price == 0){
+            return $this->toJson(5012, []);
+        }
+
+        if(!$category_id){
+            return $this->toJson(5001, []);
+        }
+
+        $category = $this->_regionService->getPriceByCategory($app_id, $category_id);
+        if($category){
+            return $this->toJson(5013, $category);
+        }
+
+        $category_price = [
+            'appid' => $app_id,
+            'category_id' => $category_id,
+            'price' => $price
+        ];
+        $res = $this->_regionService->addCategoryPrice($category_price);
+        if($res){
+            return $this->toJson(200, ['id' => $res]);
+        }else{
+            return $this->toJson(5014, $res);
+        }
+    }
+
+    /**
+     * 获取指定城市分类价格信息
+    */
+    public function getCategoryPriceById(){
+        $price_id = Q($this->request, 'price_id');
+        if(!$price_id) {
+            return $this->toJson(5015, []);
+        }
+
+        $result = $this->_regionService->getCategoryPriceInfo($price_id);
+        if($result){
+            return $this->toJson(200, $result);
+        }else{
+            return $this->toJson(5016, $result);
+        }
+    }
+
+    /**
+     * 更新指定城市分类价格信息
+     */
+    public function updateCategoryPriceById(){
+        $price_id = Q($this->request, 'price_id');
+        $category_id = Q($this->request, 'category_id');
+        $price = Q($this->request, 'price');
+        $app_id = $this->_appid ? $this->_appid : Q($this->request, 'app_id');
+        if(!$price_id) {
+            return $this->toJson(5015, []);
+        }
+        if(!$price || !is_numeric($price) || $price < 0 || $price == 0){
+            return $this->toJson(5012, []);
+        }
+        $category_price = $this->_regionService->getCategoryPriceInfo($price_id);
+        if($category_price){
+            $regionPrice = $this->_regionService->getPriceByCategory($app_id, $category_id);
+            if($regionPrice && Q($regionPrice, 'id') != $price_id){
+                return $this->toJson(5013, $regionPrice);
+            }
+            $new_price = [
+                'price' => $price,
+            ];
+            if(!$this->_regionService->updateCategoryPriceInfo($price_id, $new_price)){
+                return $this->toJson(5018, []);
+            }
+            $category = $this->_regionService->getCategoryPriceInfo($price_id);
+            return $this->toJson(200, $category);
+        }else{
+            return $this->toJson(5016, []);
+        }
+    }
+
+    /**
+     * 删除指定城市分类价格信息
+    */
+    public function deleteCategoryPriceById(){
+        $price_id = Q($this->request, 'price_id');
+        $price_info = $this->_regionService->getCategoryPriceInfo($price_id);
+        if(!$price_info){
+            return $this->toJson(5016, []);
+        }
+        if($this->_regionService->delCategoryPriceInfo($price_id)){
+            return $this->toJson(200, []);
+        }else{
+            return $this->toJson(5017, []);
+        }
+    }
+
 }

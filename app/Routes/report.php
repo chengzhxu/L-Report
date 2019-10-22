@@ -51,6 +51,11 @@ Route::group(['prefix' => '','namespace' => 'Report', 'middleware' => [],], func
     Route::any('report/update_category_region_info', 'ReportController@updateCategoryRegionById');
     Route::any('report/delete_category_region_info', 'ReportController@deleteCategoryRegionById');
 
+    Route::any('report/add_category_price', 'ReportController@addCategoryPrice');
+    Route::any('report/get_category_price_info', 'ReportController@getCategoryPriceById');
+    Route::any('report/update_category_price_info', 'ReportController@updateCategoryPriceById');
+    Route::any('report/delete_category_price_info', 'ReportController@deleteCategoryPriceById');
+
     Route::any('report/get_region_list', 'ReportController@getRegionList');
     Route::any('report/get_region_by_category', 'ReportController@getRegionByCategory');
 });
