@@ -111,8 +111,9 @@ class RegionCodeService {
                     'category_id' => Q($cate, 'category_id') ? $cate['category_id'] : 0,
                     'appid' => $appid
                 ];
-                $price = AppCategoryPriceModel::where($where)->value('price');
-                $cate['price'] = $price ? $price : 0;
+                $catePrice = AppCategoryPriceModel::where($where)->first();
+                $cate['price_id'] = $catePrice ? Q($catePrice, 'id') : 0;
+                $cate['price'] = $catePrice ? Q($catePrice, 'price') : 0;
             });
         }
 
